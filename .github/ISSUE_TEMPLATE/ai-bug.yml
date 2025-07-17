@@ -1,0 +1,52 @@
+name: "🐞 AI Bug"
+description: "AI 모델 학습/추론 오류, 데이터 처리 버그 리포트용 템플릿"
+labels: [ai, bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: "🐛 버그 설명"
+      description: "무슨 문제가 발생했는지 명확하게 적어주세요."
+      placeholder: "ex) 학습 중 메모리 부족으로 학습이 중단됨"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "🔁 재현 방법"
+      description: |
+        어떤 조건에서 문제가 발생했는지 단계별로 작성해 주세요:
+        1. 데이터셋 / 하이퍼파라미터
+        2. 실행 명령어
+        3. 에러 발생 시점
+      placeholder: |
+        1. batch_size=64, lr=0.001
+        2. python train.py
+        3. Epoch 5에서 CUDA OOM 에러 발생
+
+  - type: textarea
+    id: log
+    attributes:
+      label: "🧾 에러 로그"
+      description: "에러 메시지나 스택 트레이스를 붙여 주세요."
+      placeholder: "ex) RuntimeError: CUDA out of memory"
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "✅ 기대 동작"
+      description: "정상적으로 동작 시 어떤 결과가 나와야 하는지 적어주세요."
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: "💻 환경 정보"
+      description: "테스트한 환경, 프레임워크, GPU 정보 등"
+      placeholder: "ex) PyTorch 2.1, CUDA 11.8, A100 40GB"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: "📝 기타 참고 사항"
+      description: "관련된 실험 로그나 참고할 내용이 있다면 공유해 주세요."
