@@ -1,0 +1,42 @@
+name: "🤖 AI Feature"
+description: "AI 모델, 데이터 처리, 알고리즘 관련 기능 개발을 위한 이슈 템플릿"
+labels: [ai, feature]
+body:
+  - type: textarea
+    id: overview
+    attributes:
+      label: "📌 개요"
+      description: "추가하거나 개선하려는 AI 기능을 간단히 설명해 주세요."
+      placeholder: "ex) 모델 학습 파이프라인 개선, 전처리 로직 추가"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ 작업 내용"
+      description: |
+        구현해야 할 작업을 자유롭게 작성하세요. 예시:
+        - [ ] 데이터 전처리 파이프라인 수정
+        - [ ] 모델 학습 스크립트 개선
+        - [ ] 성능 평가 코드 작성
+
+  - type: textarea
+    id: dataset
+    attributes:
+      label: "📊 데이터셋 관련 사항"
+      description: "사용할 데이터셋, 변경 사항, 전처리 방식 등을 적어주세요."
+      placeholder: "ex) Kaggle 데이터셋 최신 버전 사용 예정"
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: "📎 참고 자료"
+      description: "논문, 레포, 실험 로그 등"
+      placeholder: "ex) https://arxiv.org/..."
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: "📝 기타 참고 사항"
+      description: "리뷰어나 팀원에게 공유할 특이사항이 있다면 적어주세요."
