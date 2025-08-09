@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ai-synthor
+    env: docker
+    repo: https://github.com/your-username/your-repo.git # 여기에 실제 GitHub 저장소 URL 입력
+    branch: main
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: ENV
+        value: production
+    healthCheckPath: /
+    autoDeploy: true
