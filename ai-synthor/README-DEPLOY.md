@@ -136,3 +136,6 @@ docker stats ai-synthor
    ```bash
    docker-compose logs ai-synthor
    ```
+
+
+

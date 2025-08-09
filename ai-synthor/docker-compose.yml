@@ -20,3 +20,5 @@ services:
 networks:
   default:
     name: ai-synthor-network
+
+

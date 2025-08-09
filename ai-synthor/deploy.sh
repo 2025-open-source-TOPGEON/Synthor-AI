@@ -34,3 +34,6 @@ else
     docker-compose logs
     exit 1
 fi
+
+
+
