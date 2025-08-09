@@ -1,6 +1,5 @@
-# app/main.py (발췌)
 from fastapi import FastAPI
-from app.api.generation import router as generation_router
+from app.api.endpoints.generation import router as generation_router
 
 app = FastAPI(
     title="Synthor-AI",
