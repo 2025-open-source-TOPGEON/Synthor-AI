@@ -9,4 +9,5 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-app.include_router(generation_router, prefix="/api/generation")
+# 최종 경로: POST /api/fields/ai-suggest
+app.include_router(generation_router, prefix="/api")
