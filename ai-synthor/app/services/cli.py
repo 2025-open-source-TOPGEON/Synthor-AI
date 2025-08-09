@@ -67,6 +67,7 @@ if __name__ == "__main__":
         "년월일 포맷",
         "year-month-day format",
         "주문 날짜(order_date)는 2025-02-01 ~ 2025-11-31 사이여야 해.",
+        "비밀번호는 최소 10자 이상이고 숫자와 특수 문자가 포함되어야 해",
     ]
     for t in test_cases:
         print("입력:", t)

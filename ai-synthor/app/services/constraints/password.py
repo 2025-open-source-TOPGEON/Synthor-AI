@@ -8,7 +8,20 @@ class PasswordExtractor(ConstraintExtractor):
         c = {}
 
         def pick(m):
-            return int(next(filter(None, m.groups()))) if m else None
+            if not m:
+                return None
+            # 포함 패턴의 경우 그룹이 비어있으면 기본값 1 반환
+            groups = list(filter(None, m.groups()))
+            if groups:
+                # 숫자인지 확인 후 변환
+                for group in groups:
+                    if group.isdigit():
+                        return int(group)
+                # 숫자가 없으면 포함 패턴으로 간주하고 기본값 1 반환
+                return 1
+            else:
+                # 포함 패턴으로 매치된 경우 기본값 1 반환
+                return 1
 
         #최소 길이 (숫자 명시형만, ≥N)
         m_min = re.search(
@@ -54,7 +67,8 @@ class PasswordExtractor(ConstraintExtractor):
             r'numbers?[:\s]*:?[\s]*(\d+)|'
             r'digits?[:\s]*:?[\s]*(\d+)|'
             r'numerals?[:\s]*:?[\s]*(\d+)|'                         #numeral: 2
-            r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*(?:digits?|numbers?|numerals?)',
+            r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*(?:digits?|numbers?|numerals?)|'
+            r'(숫자.*?포함.*?(?:되어야|해야)|포함.*?숫자)',              # 숫자 포함되어야 해
             text, re.I
         )
 
@@ -67,7 +81,8 @@ class PasswordExtractor(ConstraintExtractor):
             r'symbols?[:\s]*:?[\s]*(\d+)|'
             r'punctuation[:\s]*:?[\s]*(\d+)|'
             r'non[- ]?alphanumeric[:\s]*:?[\s]*(\d+)|'
-            r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*(?:symbols?|punctuation|special\s*(?:chars?|characters?))',
+            r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*(?:symbols?|punctuation|special\s*(?:chars?|characters?))|'
+            r'((?:특수.*?문자|특문|기호).*?포함.*?(?:되어야|해야)|포함.*?(?:특수.*?문자|특문|기호))',  # 특수 문자 포함되어야 해
             text, re.I
         )
 
