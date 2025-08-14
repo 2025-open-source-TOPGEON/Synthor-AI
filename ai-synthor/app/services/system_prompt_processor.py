@@ -3,7 +3,7 @@ System prompt processor for auto-generating field sets from overall purpose prom
 """
 import re
 from typing import Dict, Any, List
-from .utils.language_detect import detect_supported_language
+from ..utils.language_detect import detect_supported_language
 from .korean_processor import parse_korean_text_to_json
 from .english_processor import parse_english_text_to_json
 
