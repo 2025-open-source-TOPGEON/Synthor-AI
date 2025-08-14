@@ -6,11 +6,27 @@ KOR_TO_ENG_FIELD = {
     "풀네임": "korean_full_name", "전성 이름": "korean_full_name", "이름": "korean_full_name",
     "이름 전부": "korean_full_name", "이름 풀": "korean_full_name", "이름(전체)": "korean_full_name",
     "이름(풀)": "korean_full_name", "이름 전체명": "korean_full_name", "이름 풀네임": "korean_full_name",
-    # korean_last_name
-    "성": "korean_last_name", "성씨": "korean_last_name", "이씨": "korean_last_name", "김씨": "korean_last_name",
-    "박씨": "korean_last_name", "최씨": "korean_last_name", "이 성": "korean_last_name", "김 성": "korean_last_name",
-    "박 성": "korean_last_name", "최 성": "korean_last_name", "성(이)": "korean_last_name", "성(김)": "korean_last_name",
-    "성(박)": "korean_last_name", "성(최)": "korean_last_name",
+    "최씨 이름": "korean_full_name", "김씨 이름": "korean_full_name", "이씨 이름": "korean_full_name", "박씨 이름": "korean_full_name",
+    "성을 가진 사람": "korean_full_name", "성씨를 가진 사람": "korean_full_name", "성씨가 있는 사람": "korean_full_name",
+    "정씨만": "korean_last_name", "강씨만": "korean_last_name", "조씨만": "korean_last_name", "윤씨만": "korean_last_name",
+         # korean_last_name - 모든 성씨 관련 패턴을 korean_full_name으로 변경
+     "성": "korean_full_name", "성씨": "korean_full_name", "이씨": "korean_full_name", "김씨": "korean_full_name",
+     "박씨": "korean_full_name", "최씨": "korean_full_name", "이 성": "korean_full_name", "김 성": "korean_full_name",
+     "박 성": "korean_full_name", "최 성": "korean_full_name", "성(이)": "korean_full_name", "성(김)": "korean_full_name",
+     "성(박)": "korean_full_name", "성(최)": "korean_full_name",
+     # 한국어 전용 표현 (성씨 + 조사/형태소 변형 조합) - korean_full_name으로 변경
+     "성이 인 사람": "korean_full_name", "성씨가 인 사람": "korean_full_name", "씨인 사람": "korean_full_name",
+     "씨 인 사람": "korean_full_name", "성을 가진 사람": "korean_full_name", "성씨를 가진 사람": "korean_full_name",
+           "씨만": "korean_full_name", "성씨만": "korean_full_name", "씨면": "korean_full_name", "씨 성을 가진 사람": "korean_full_name",
+     "성(姓)이 인 사람": "korean_full_name",
+     "으로 시작하는 사람": "korean_full_name", "로 시작하는 사람": "korean_full_name",
+     "성을 쓰는 사람": "korean_full_name", "성씨를 쓰는 사람": "korean_full_name",
+     "임": "korean_full_name", "으로 되어 있는 사람": "korean_full_name", "라는 사람": "korean_full_name",
+     "이신 분": "korean_full_name", "이신 사람": "korean_full_name", "로 끝나는 사람": "korean_full_name",
+     # 한국어 + 영어 혼합 표현
+     "last name:": "korean_full_name", "family name:": "korean_full_name",
+     "full name starts with": "korean_full_name", "full name begins with": "korean_full_name",
+
     # korean_first_name
     "이름(이)": "korean_first_name", "이름(김)": "korean_first_name", "이름(박)": "korean_first_name",
     "이름(최)": "korean_first_name", "이름만": "korean_first_name", "이름(한글)": "korean_first_name",
@@ -169,7 +185,15 @@ KOR_TO_ENG_VALUE = {
 EN_TO_TYPE_FIELD = {
     "full name": "full_name", "fullname": "full_name", "name": "full_name",
     "first name": "first_name", "given name": "first_name",
-    "last name": "last_name", "surname": "last_name",
+    "last name": "last_name", "surname": "last_name", "family name": "last_name",
+    # 영어 전용 표현 (성씨도 로마자 표기)
+    "last name is": "last_name", "family name is": "last_name", "surname is": "last_name",
+    "whose last name is": "last_name", "whose family name is": "last_name", "whose surname is": "last_name",
+    "person whose last name is": "last_name", "person whose surname is": "last_name",
+    "users with last name": "last_name", "people with surname": "last_name",
+    "having last name": "last_name", "having family name": "last_name",
+    "last name equal to": "last_name", "surname equal to": "last_name",
+    "as last name": "last_name", "as family name": "last_name",
     "phone": "phone", "phone number": "phone",
     "address": "address", "full address": "address",
     "street address": "street_address", "road address": "street_address",
