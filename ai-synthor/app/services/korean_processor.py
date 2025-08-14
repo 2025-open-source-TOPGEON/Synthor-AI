@@ -22,7 +22,8 @@ SUPPORTED_TYPES = {
 # 조건이 붙을 수 있는 타입 목록
 CONSTRAINT_TYPES = {
     "password", "phone", "avatar", "state", "country", "datetime", "time", "url",
-    "credit_card_number", "credit_card_type", "paragraphs", "number_between_1_100"
+    "credit_card_number", "credit_card_type", "paragraphs", "number_between_1_100",
+    "korean_full_name", "korean_last_name"
 }
 
 # state, country, credit_card_number, credit_card_type 지원 값 정의 (예시)

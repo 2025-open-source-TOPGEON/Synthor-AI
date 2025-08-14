@@ -20,6 +20,7 @@ from .constraints.credit_card_number import CreditCardNumberExtractor
 from .constraints.credit_card_type import CreditCardTypeExtractor
 from .constraints.paragraphs import ParagraphsExtractor
 from .constraints.number_between import NumberBetweenExtractor
+from .constraints.korean_full_name import KoreanFullNameExtractor, KoreanLastNameExtractor
 
 
 class Parser:
@@ -36,7 +37,8 @@ class Parser:
             PasswordExtractor(), PhoneExtractor(), AvatarExtractor(),
             StateExtractor(), CountryExtractor(), DatetimeExtractor(),
             TimeExtractor(), UrlExtractor(), CreditCardNumberExtractor(),
-            CreditCardTypeExtractor(), ParagraphsExtractor(), NumberBetweenExtractor()
+            CreditCardTypeExtractor(), ParagraphsExtractor(), NumberBetweenExtractor(),
+            KoreanFullNameExtractor(), KoreanLastNameExtractor()
         ]:
             reg.register(ext)
         return reg
