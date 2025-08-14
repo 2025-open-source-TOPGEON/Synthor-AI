@@ -158,6 +158,10 @@ class EmailAddressConstraint:
             "format": "이메일 형식 제한 (예: 'local@domain.com')"
         }
     
+    def extract(self, text: str) -> Optional[Dict[str, Any]]:
+        """텍스트에서 이메일 제약 조건 추출 (registry에서 호출되는 메서드)"""
+        return self.parse_korean_constraints(text)
+    
     def parse_korean_constraints(self, text: str) -> Optional[Dict[str, Any]]:
         """한글 텍스트에서 이메일 제약 조건 파싱"""
         constraints = {}

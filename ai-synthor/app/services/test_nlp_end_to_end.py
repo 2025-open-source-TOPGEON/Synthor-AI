@@ -422,10 +422,10 @@ test_cases = [
      "@app형 메일로요.",
      "@site형 이메일로요.",
      "@web형 계정으로요.",
-     "@user형으로 해주세요.",
+     "@user형으로 하고 결측치 30.",
      "@admin형으로요.",
      "@support형 메일로요.",
-     "@info로",
+     "@info로 null 10&",
 ]
 
 parser = Parser()
