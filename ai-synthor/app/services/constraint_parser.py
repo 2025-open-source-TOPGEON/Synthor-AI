@@ -20,6 +20,7 @@ from .constraints.credit_card_type import CreditCardTypeExtractor
 from .constraints.paragraphs import ParagraphsExtractor
 from .constraints.number_between import NumberBetweenExtractor
 from .constraints.korean_full_name import KoreanFullNameExtractor, KoreanLastNameExtractor
+from .constraints.email import EmailExtractor
 
 class Parser:
     def __init__(self):
@@ -36,7 +37,7 @@ class Parser:
             StateExtractor(), CountryExtractor(), DatetimeExtractor(),
             TimeExtractor(), UrlExtractor(), CreditCardNumberExtractor(),
             CreditCardTypeExtractor(), ParagraphsExtractor(), NumberBetweenExtractor(),
-            KoreanFullNameExtractor(), KoreanLastNameExtractor()
+            KoreanFullNameExtractor(), KoreanLastNameExtractor(), EmailExtractor()
         ]:
             reg.register(ext)
         return reg
@@ -73,6 +74,13 @@ class Parser:
                     field = "country"
                     extractor = country_extractor
         
+        elif field == "email_address":
+            email_extractor = self.registry.get("email_address")
+            if email_extractor:
+                email_constraints = email_extractor.extract(text) or {}
+                if email_constraints:  # email constraints가 있으면 email_address → email_address로 유지
+                    extractor = email_extractor
+        
 
         
         try:
@@ -93,8 +101,11 @@ class Parser:
             if field == "number_between_1_100" or field.startswith("korean_"):
                 type_name = field
             else:
-                # 타입 이름을 대문자로 시작하도록 변환
-                type_name = field.replace("_", " ").title().replace(" ", "")
+                # email_address는 그대로 유지, 나머지는 대문자로 시작하도록 변환
+                if field == "email_address":
+                    type_name = field
+                else:
+                    type_name = field.replace("_", " ").title().replace(" ", "")
             return {"type": type_name, "constraints": constraints, "nullablePercent": nullable}
         else:
             type_name = field.replace("_", " ").title().replace(" ", "")
