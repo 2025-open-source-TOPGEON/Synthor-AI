@@ -11,7 +11,7 @@ class GlobalQualifiersExtractor:
         if "한국어" in text or "korean" in low: c["lang"] = "ko"
         m = re.search(r"(\d+)세 미만|under (\d+)", text)
         if m:
-            c["max"] = int(m.group(1) or m.group(2))
+            c["max"] = int(m.group(1) or m.group(2)) - 1  # 배타적 처리
         if "gmail" in low:
             c["domain"] = "gmail.com"
         return c

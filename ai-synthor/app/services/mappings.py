@@ -103,6 +103,51 @@ KOR_TO_ENG_FIELD = {
     "위도": "latitude",
     "경도": "longitude",
     "숫자": "number_between_1_100", "1과 100 사이 숫자": "number_between_1_100", "1~100 숫자": "number_between_1_100",
+    # 나이 관련 키워드 추가
+    "나이": "number_between_1_100", "연령": "number_between_1_100", "연령대": "number_between_1_100",
+    "나이대": "number_between_1_100", "세": "number_between_1_100", "살": "number_between_1_100",
+    # 금액/가격 관련 키워드
+    "가격": "number_between_1_100", "금액": "number_between_1_100", "결제금액": "number_between_1_100",
+    "최소결제금액": "number_between_1_100", "최소 결제금액": "number_between_1_100",
+    "price": "number_between_1_100", "amount": "number_between_1_100", "payment": "number_between_1_100",
+    "minimum payment": "number_between_1_100", "minimum amount": "number_between_1_100", "minimum": "number_between_1_100",
+    "원": "number_between_1_100", "달러": "number_between_1_100", "USD": "number_between_1_100",
+    "EUR": "number_between_1_100", "€": "number_between_1_100", "￥": "number_between_1_100", "£": "number_between_1_100",
+    # 수량/개수 관련 키워드
+    "수량": "number_between_1_100", "개수": "number_between_1_100", "참가자": "number_between_1_100",
+    "quantity": "number_between_1_100", "count": "number_between_1_100", "participants": "number_between_1_100",
+    "items": "number_between_1_100", "개": "number_between_1_100", "명": "number_between_1_100",
+    # 길이/거리 관련 키워드
+    "길이": "number_between_1_100", "거리": "number_between_1_100", "폭": "number_between_1_100",
+    "length": "number_between_1_100", "distance": "number_between_1_100", "width": "number_between_1_100",
+    "cm": "number_between_1_100", "m": "number_between_1_100", "km": "number_between_1_100",
+    "inch": "number_between_1_100", "ft": "number_between_1_100", "meters": "number_between_1_100",
+    # 무게/질량 관련 키워드
+    "무게": "number_between_1_100", "질량": "number_between_1_100",
+    "weight": "number_between_1_100", "mass": "number_between_1_100",
+    "kg": "number_between_1_100", "g": "number_between_1_100", "ton": "number_between_1_100",
+    "lb": "number_between_1_100", "oz": "number_between_1_100", "grams": "number_between_1_100",
+    # 온도 관련 키워드
+    "온도": "number_between_1_100", "섭씨": "number_between_1_100",
+    "temperature": "number_between_1_100", "celsius": "number_between_1_100",
+    "℃": "number_between_1_100", "℉": "number_between_1_100", "도": "number_between_1_100",
+    # 속도 관련 키워드
+    "속도": "number_between_1_100", "주행속도": "number_between_1_100",
+    "speed": "number_between_1_100", "driving speed": "number_between_1_100",
+    "km/h": "number_between_1_100", "mph": "number_between_1_100",
+    # 시간/기간 관련 키워드
+    "시간": "number_between_1_100", "기간": "number_between_1_100", "분": "number_between_1_100",
+    "time": "number_between_1_100", "duration": "number_between_1_100", "minutes": "number_between_1_100",
+    "hours": "number_between_1_100", "days": "number_between_1_100", "주": "number_between_1_100",
+    "월": "number_between_1_100", "년": "number_between_1_100", "초": "number_between_1_100",
+    # 퍼센트/비율 관련 키워드
+    "성공률": "number_between_1_100", "확률": "number_between_1_100", "퍼센트": "number_between_1_100",
+    "success rate": "number_between_1_100", "probability": "number_between_1_100", "percentage": "number_between_1_100",
+    "%": "number_between_1_100", "비율": "number_between_1_100", "ratio": "number_between_1_100",
+    # 등급/점수 관련 키워드
+    "점수": "number_between_1_100", "등급": "number_between_1_100", "평점": "number_between_1_100",
+    "score": "number_between_1_100", "grade": "number_between_1_100", "rating": "number_between_1_100",
+    "점": "number_between_1_100", "등급": "number_between_1_100",
 }
 
 KOR_TO_ENG_VALUE = {
@@ -173,4 +218,39 @@ EN_TO_TYPE_FIELD = {
     "time": "time",
     "latitude": "latitude", "longitude": "longitude",
     "number": "number_between_1_100", "number between 1 and 100": "number_between_1_100",
+    # 나이 관련 영어 키워드 추가
+    "age": "number_between_1_100", "years old": "number_between_1_100", "year old": "number_between_1_100",
+    "years": "number_between_1_100", "year": "number_between_1_100", "minimum age": "number_between_1_100",
+    "maximum age": "number_between_1_100", "exact age": "number_between_1_100",
+    # 금액/가격 관련 키워드
+    "price": "number_between_1_100", "amount": "number_between_1_100", "payment": "number_between_1_100",
+    "minimum payment": "number_between_1_100", "minimum amount": "number_between_1_100", "minimum": "number_between_1_100",
+    "minimum payment is": "number_between_1_100", "minimum amount is": "number_between_1_100",
+    "USD": "number_between_1_100", "EUR": "number_between_1_100", "dollars": "number_between_1_100",
+    # 수량/개수 관련 키워드
+    "quantity": "number_between_1_100", "count": "number_between_1_100", "participants": "number_between_1_100",
+    "items": "number_between_1_100", "order": "number_between_1_100",
+    # 길이/거리 관련 키워드
+    "length": "number_between_1_100", "distance": "number_between_1_100", "width": "number_between_1_100",
+    "cm": "number_between_1_100", "m": "number_between_1_100", "km": "number_between_1_100",
+    "inch": "number_between_1_100", "ft": "number_between_1_100", "meters": "number_between_1_100",
+    # 무게/질량 관련 키워드
+    "weight": "number_between_1_100", "mass": "number_between_1_100",
+    "kg": "number_between_1_100", "g": "number_between_1_100", "ton": "number_between_1_100",
+    "lb": "number_between_1_100", "oz": "number_between_1_100", "grams": "number_between_1_100",
+    # 온도 관련 키워드
+    "temperature": "number_between_1_100", "celsius": "number_between_1_100",
+    "℃": "number_between_1_100", "℉": "number_between_1_100",
+    # 속도 관련 키워드
+    "speed": "number_between_1_100", "driving speed": "number_between_1_100",
+    "km/h": "number_between_1_100", "mph": "number_between_1_100",
+    # 시간/기간 관련 키워드
+    "time": "number_between_1_100", "duration": "number_between_1_100", "minutes": "number_between_1_100",
+    "hours": "number_between_1_100", "days": "number_between_1_100", "seconds": "number_between_1_100",
+    "weeks": "number_between_1_100", "months": "number_between_1_100", "years": "number_between_1_100",
+    # 퍼센트/비율 관련 키워드
+    "success rate": "number_between_1_100", "probability": "number_between_1_100", "percentage": "number_between_1_100",
+    "%": "number_between_1_100", "ratio": "number_between_1_100",
+    # 등급/점수 관련 키워드
+    "score": "number_between_1_100", "grade": "number_between_1_100", "rating": "number_between_1_100",
 }

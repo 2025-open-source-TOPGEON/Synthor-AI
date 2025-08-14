@@ -342,7 +342,11 @@ def parse_korean_text_to_json(text: str) -> dict:
                         cdict["min"] = int(min_val)
                     if max_match:
                         max_val = next(filter(None, max_match.groups()))
-                        cdict["max"] = int(max_val)
+                        # under 패턴인 경우 배타적 처리
+                        if "under" in max_match.group(0).lower():
+                            cdict["max"] = int(max_val) - 1
+                        else:
+                            cdict["max"] = int(max_val)
                     if decimals_match:
                         dec_val = next(filter(None, decimals_match.groups()))
                         cdict["decimals"] = int(dec_val)

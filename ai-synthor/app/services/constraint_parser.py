@@ -85,8 +85,12 @@ class Parser:
 
         # 4) 최종 JSON 조립 (원 코드와 완전 동일 포맷)
         if field in CONSTRAINT_TYPES:
-            # 타입 이름을 대문자로 시작하도록 변환
-            type_name = field.replace("_", " ").title().replace(" ", "")
+            # number_between_1_100은 원래 이름 그대로 사용
+            if field == "number_between_1_100":
+                type_name = field
+            else:
+                # 타입 이름을 대문자로 시작하도록 변환
+                type_name = field.replace("_", " ").title().replace(" ", "")
             return {"type": type_name, "constraints": constraints, "nullablePercent": nullable}
         else:
             type_name = field.replace("_", " ").title().replace(" ", "")

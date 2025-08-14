@@ -152,7 +152,7 @@ def parse_english_text_to_json(text: str) -> dict:
                     over = re.search(r'over (\d+)', seg, re.IGNORECASE)
                     at_least = re.search(r'at least (\d+)', seg, re.IGNORECASE)
                     decimals = re.search(r'decimals?\s*(\d+)', seg, re.IGNORECASE)
-                    if under: cdict["max"] = int(under.group(1))
+                    if under: cdict["max"] = int(under.group(1)) - 1  # 배타적 처리
                     if over: cdict["min"] = int(over.group(1))
                     if at_least: cdict["min"] = int(at_least.group(1))
                     if decimals: cdict["decimals"] = int(decimals.group(1))
@@ -188,7 +188,7 @@ def parse_english_text_to_json(text: str) -> dict:
                     over = re.search(r'over (\d+)', seg, re.IGNORECASE)
                     at_least = re.search(r'at least (\d+)', seg, re.IGNORECASE)
                     decimals = re.search(r'decimals?\s*(\d+)', seg, re.IGNORECASE)
-                    if under: cdict["max"] = int(under.group(1))
+                    if under: cdict["max"] = int(under.group(1)) - 1  # 배타적 처리
                     if over: cdict["min"] = int(over.group(1))
                     if at_least: cdict["min"] = int(at_least.group(1))
                     if decimals: cdict["decimals"] = int(decimals.group(1))

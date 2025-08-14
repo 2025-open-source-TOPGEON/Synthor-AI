@@ -2,13 +2,16 @@ import re
 
 class NullablePercentExtractor:
     def extract(self, text: str) -> int:
-        # 우선순위: ko → blank → nullable → null → missing → ratio
+        # 우선순위: null field percentage → ko → blank → nullable → null → missing → ratio
         checks = [
-            re.search(r'빈\s*값?\s*(\d+)%|빈값\s*(\d+)%|비어?\s*있음?\s*(\d+)%|null\s*값?\s*(\d+)%|빈\s*(\d+)%', text, re.I),
+            # Handle "null field_name percentage%" pattern (e.g., "null age 5%")
+            re.search(r'^null\s+\w+\s+(\d+)%', text, re.I),
+            re.search(r'빈\s*값?\s*(\d+)%|빈값\s*(\d+)%|비어?\s*있음?\s*(\d+)%|null\s*값?\s*(\d+)%|빈\s*(\d+)%|결측치\s*(\d+)%', text, re.I),
             re.search(r'blank\s*:?\s*(\d+)%', text, re.I),
             re.search(r'nullable\s*:?\s*(\d+)%', text, re.I),
             re.search(r'(?<!non-)null\s*:?\s*(\d+)%', text, re.I),
             re.search(r'missing\s*:?\s*(\d+)%', text, re.I),
+            re.search(r'missing\s+\w+\s+(\d+)%', text, re.I),  # "missing age 20%" 패턴
         ]
         for m in checks:
             if m:
