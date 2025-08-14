@@ -19,6 +19,7 @@ from .constraints.credit_card_number import CreditCardNumberExtractor
 from .constraints.credit_card_type import CreditCardTypeExtractor
 from .constraints.paragraphs import ParagraphsExtractor
 from .constraints.number_between import NumberBetweenExtractor
+from .constraints.korean_full_name import KoreanFullNameExtractor, KoreanLastNameExtractor
 
 class Parser:
     def __init__(self):
@@ -34,7 +35,8 @@ class Parser:
             PasswordExtractor(), PhoneExtractor(), AvatarExtractor(),
             StateExtractor(), CountryExtractor(), DatetimeExtractor(),
             TimeExtractor(), UrlExtractor(), CreditCardNumberExtractor(),
-            CreditCardTypeExtractor(), ParagraphsExtractor(), NumberBetweenExtractor()
+            CreditCardTypeExtractor(), ParagraphsExtractor(), NumberBetweenExtractor(),
+            KoreanFullNameExtractor(), KoreanLastNameExtractor()
         ]:
             reg.register(ext)
         return reg
@@ -71,6 +73,8 @@ class Parser:
                     field = "country"
                     extractor = country_extractor
         
+
+        
         try:
             constraints = extractor.extract(text) or {}
         except ValueError as e:
@@ -85,8 +89,8 @@ class Parser:
 
         # 4) 최종 JSON 조립 (원 코드와 완전 동일 포맷)
         if field in CONSTRAINT_TYPES:
-            # number_between_1_100은 원래 이름 그대로 사용
-            if field == "number_between_1_100":
+            # number_between_1_100과 korean_* 타입들은 원래 이름 그대로 사용
+            if field == "number_between_1_100" or field.startswith("korean_"):
                 type_name = field
             else:
                 # 타입 이름을 대문자로 시작하도록 변환
