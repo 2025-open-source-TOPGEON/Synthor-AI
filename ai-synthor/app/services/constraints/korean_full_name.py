@@ -68,6 +68,7 @@ class KoreanFullNameExtractor(ConstraintExtractor):
             m = re.search(p, t)
             if m:
                 surname = self._strip_josa(m.group(1))
+                # 성씨 길이 검증만 하고, 사전 검증은 나중에 하도록 수정
                 if re.fullmatch(self._H15, surname):
                     return {"lastName": surname}
 
