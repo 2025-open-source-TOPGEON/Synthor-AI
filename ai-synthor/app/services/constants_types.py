@@ -21,7 +21,7 @@ SUPPORTED_TYPES = {
 # 제약이 붙는 타입
 CONSTRAINT_TYPES = {
     "password", "phone", "avatar", "state", "country", "datetime", "time", "url",
-    "credit_card_number", "credit_card_type", "paragraphs", "number_between_1_100", "korean_full_name", "korean_last_name"
+    "credit_card_number", "credit_card_type", "paragraphs", "number_between_1_100", "korean_full_name", "korean_last_name", "email_address"
 }
 
 SUPPORTED_STATES = {

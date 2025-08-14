@@ -23,7 +23,7 @@ SUPPORTED_TYPES = {
 CONSTRAINT_TYPES = {
     "password", "phone", "avatar", "state", "country", "datetime", "time", "url",
     "credit_card_number", "credit_card_type", "paragraphs", "number_between_1_100",
-    "korean_full_name", "korean_last_name"
+    "korean_full_name", "korean_last_name", "email_address"
 }
 
 # state, country, credit_card_number, credit_card_type 지원 값 정의 (예시)
@@ -515,6 +515,55 @@ def parse_korean_text_to_json(text: str) -> dict:
                         cdict["max"] = int(max_val)
                     if cdict:
                         constraints = cdict
+                # email_address
+                elif eng == "email_address":
+                    # 네이버, 구글 등 한글 도메인명 매핑
+                    korean_domain_mapping = {
+                        "네이버": "naver.com",
+                        "구글": "gmail.com",
+                        "gmail": "gmail.com",  # 영문 gmail도 추가
+                        "야후": "yahoo.com",
+                        "핫메일": "hotmail.com",
+                        "아웃룩": "outlook.com",
+                        "다음": "daum.net",
+                        "네이트": "nate.com",
+                        "한메일": "hanmail.net",
+                        "아이클라우드": "icloud.com",
+                        "프로톤메일": "protonmail.com"
+                    }
+                    
+                    # 지원하는 도메인 목록
+                    supported_domains = {
+                        "naver.com", "gmail.com", "yahoo.com", "hotmail.com", "outlook.com",
+                        "daum.net", "nate.com", "hanmail.net", "icloud.com", "protonmail.com"
+                    }
+                    
+                    cdict = {}
+                    
+                    # 여러 도메인 제약 조건 파싱 (예: "네이버나 구글 이메일") - 먼저 확인
+                    domains = []
+                    for kor_domain, eng_domain in korean_domain_mapping.items():
+                        if kor_domain in text:
+                            domains.append(eng_domain)
+                    
+                    if len(domains) > 1:
+                        cdict["domains"] = domains
+                    else:
+                        # 단일 도메인 제약 조건 파싱
+                        for kor_domain, eng_domain in korean_domain_mapping.items():
+                            if f"{kor_domain}만" in text or f"{kor_domain} 이메일" in text:
+                                cdict["domain"] = eng_domain
+                                break
+                        
+                        # 영문 도메인 직접 매칭
+                        if not cdict:
+                            for domain in supported_domains:
+                                if f"{domain}만" in text or f"{domain} 이메일" in text:
+                                    cdict["domain"] = domain
+                                    break
+                    
+                    if cdict:
+                        constraints = cdict
             # 나머지 타입은 constraints 없이 제공
             if eng not in SUPPORTED_TYPES:
                 unsupported_fields.append(eng)
@@ -525,7 +574,7 @@ def parse_korean_text_to_json(text: str) -> dict:
                     field_type = "string"
                 else:
                     field_type = "string"
-                field_obj = {"name": eng, "type": field_type}
+                field_obj = {"type": eng}
                 if constraints is not None:
                     field_obj["constraints"] = constraints
                 fields.append(field_obj)
@@ -692,6 +741,55 @@ def parse_korean_text_to_json(text: str) -> dict:
                         cdict["max"] = int(para_max.group(1))
                     if cdict:
                         constraints = cdict
+                # email_address
+                elif eng == "email_address":
+                    # 네이버, 구글 등 한글 도메인명 매핑
+                    korean_domain_mapping = {
+                        "네이버": "naver.com",
+                        "구글": "gmail.com",
+                        "gmail": "gmail.com",  # 영문 gmail도 추가
+                        "야후": "yahoo.com",
+                        "핫메일": "hotmail.com",
+                        "아웃룩": "outlook.com",
+                        "다음": "daum.net",
+                        "네이트": "nate.com",
+                        "한메일": "hanmail.net",
+                        "아이클라우드": "icloud.com",
+                        "프로톤메일": "protonmail.com"
+                    }
+                    
+                    # 지원하는 도메인 목록
+                    supported_domains = {
+                        "naver.com", "gmail.com", "yahoo.com", "hotmail.com", "outlook.com",
+                        "daum.net", "nate.com", "hanmail.net", "icloud.com", "protonmail.com"
+                    }
+                    
+                    cdict = {}
+                    
+                    # 여러 도메인 제약 조건 파싱 (예: "네이버나 구글 이메일") - 먼저 확인
+                    domains = []
+                    for kor_domain, eng_domain in korean_domain_mapping.items():
+                        if kor_domain in text:
+                            domains.append(eng_domain)
+                    
+                    if len(domains) > 1:
+                        cdict["domains"] = domains
+                    else:
+                        # 단일 도메인 제약 조건 파싱
+                        for kor_domain, eng_domain in korean_domain_mapping.items():
+                            if f"{kor_domain}만" in text or f"{kor_domain} 이메일" in text:
+                                cdict["domain"] = eng_domain
+                                break
+                        
+                        # 영문 도메인 직접 매칭
+                        if not cdict:
+                            for domain in supported_domains:
+                                if f"{domain}만" in text or f"{domain} 이메일" in text:
+                                    cdict["domain"] = domain
+                                    break
+                    
+                    if cdict:
+                        constraints = cdict
             if eng not in SUPPORTED_TYPES:
                 unsupported_fields.append(eng)
             else:
@@ -701,7 +799,7 @@ def parse_korean_text_to_json(text: str) -> dict:
                     field_type = "string"
                 else:
                     field_type = "string"
-                field_obj = {"name": eng, "type": field_type}
+                field_obj = {"type": eng}
                 if constraints is not None:
                     field_obj["constraints"] = constraints
                 fields.append(field_obj)
@@ -725,6 +823,11 @@ def parse_korean_text_to_json(text: str) -> dict:
 # 혼합 입력 테스트 케이스 추가
 if __name__ == "__main__":
     test_cases = [
+        # 이메일 제약 조건 테스트
+        "네이버만 이메일 3개",
+        "gmail만 이메일 2개",
+        "네이버나 구글 이메일 5개",
+        "naver.com만 이메일 주소 1개",
         # 혼합 입력 예시
         "10 users, 이메일은 gmail만, 나이는 under 40",
         "Generate 5개 email_address, 이름은 한국어로",
