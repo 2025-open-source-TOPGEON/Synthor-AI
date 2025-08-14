@@ -5,6 +5,8 @@ from typing import Dict, Any, Optional
 class EmailAddressConstraint:
     """이메일 주소 제약 조건 처리기"""
     
+    type_name = "email_address"
+    
     def __init__(self):
         # 지원하는 이메일 도메인 목록
         self.supported_domains = {
