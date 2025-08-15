@@ -20,6 +20,9 @@ class EmailAddressConstraint:
             "ajou.ac.kr", "chosun.ac.kr", "kmu.ac.kr", "dankook.ac.kr"
         }
         
+        # 트레일링 구두점/조사 제거용 정규식
+        self._trailing_josa_punct_re = re.compile(r'[\s\.,!?:;\)\]\}]+$')
+
         # 한글 도메인명 → 영문 도메인명 매핑
         self.korean_domain_mapping = {
             "네이버": "naver.com",
@@ -83,8 +86,19 @@ class EmailAddressConstraint:
             "계명대": "kmu.ac.kr",
             "계명대학교": "kmu.ac.kr",
             "단국대": "dankook.ac.kr",
-            "단국대학교": "dankook.ac.kr"
+            "단국대학교": "dankook.ac.kr",
         }
+
+    def _sanitize_domain(self, domain: str) -> str:
+        """도메인 끝의 불필요한 구두점/공백 제거 및 한글 조사 흔적 제거"""
+        if not isinstance(domain, str):
+            return domain
+        # 끝의 구두점/공백 제거
+        domain = self._trailing_josa_punct_re.sub('', domain)
+        # 끝의 한글 조사 제거 (로/으로 등은 상위 정규식에서 제외되지만 방어적으로 처리)
+        domain = re.sub(r'(로|으로)$', '', domain)
+        return domain
+
     
     def validate_constraints(self, constraints: Dict[str, Any]) -> bool:
         """제약 조건 유효성 검사"""
@@ -176,6 +190,13 @@ class EmailAddressConstraint:
             if f"To {domain}" in text or f"to {domain}" in text:
                 constraints["domain"] = domain
                 return constraints
+            # 도메인만 입력한 경우 (naver.com, gmail.com 등)
+            if domain in text:
+                # 다른 도메인이 함께 있는지 확인
+                other_domains = [d for d in self.supported_domains if d != domain and d in text]
+                if not other_domains:
+                    constraints["domain"] = domain
+                    return constraints
         
         # 2. 한글 도메인명 매칭 (확장된 패턴)
         for kor_domain, eng_domain in self.korean_domain_mapping.items():
@@ -281,7 +302,7 @@ class EmailAddressConstraint:
         domain_pattern = r'([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\s*(메일|형식|이메일|만|으로요|로요)'
         domain_match = re.search(domain_pattern, text)
         if domain_match:
-            domain = domain_match.group(1)
+            domain = self._sanitize_domain(domain_match.group(1))
             constraints["domain"] = domain
             return constraints
         
@@ -289,7 +310,7 @@ class EmailAddressConstraint:
         english_domain_pattern = r'(To|to)\s+([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
         english_match = re.search(english_domain_pattern, text)
         if english_match:
-            domain = english_match.group(2)
+            domain = self._sanitize_domain(english_match.group(2))
             constraints["domain"] = domain
             return constraints
         
@@ -309,7 +330,7 @@ class EmailAddressConstraint:
         
         for pattern, domain in long_english_patterns.items():
             if pattern in text:
-                constraints["domain"] = domain
+                constraints["domain"] = self._sanitize_domain(domain)
                 return constraints
         
         # 6. @도메인형 패턴 매칭 (사용자가 임의의 도메인을 요청하는 경우)
@@ -317,7 +338,7 @@ class EmailAddressConstraint:
         at_domain_korean_pattern = r'@([a-zA-Z0-9.-]+)(형으로|형로|형으로요|형로요|형으로는|형로는|형으로만|형로만|형으로부터|형로부터|형으로 해주세요|형로 해주세요|형으로 부탁드립니다|형로 부탁드립니다|형으로 해주시면 됩니다|형로 해주시면 됩니다|형으로 작성해주세요|형로 작성해주세요|형 메일로|형 메일로요|형 메일 주소로|형 이메일로|형 이메일로요|형 계정으로|형 계정 이메일로)'
         at_domain_korean_match = re.search(at_domain_korean_pattern, text)
         if at_domain_korean_match:
-            domain = at_domain_korean_match.group(1)
+            domain = self._sanitize_domain(at_domain_korean_match.group(1))
             constraints["domain"] = domain
             return constraints
         
@@ -325,7 +346,7 @@ class EmailAddressConstraint:
         at_domain_english_pattern = r'@([a-zA-Z0-9.-]+)(\s+email|\s+address|\s+format|\s+domain\s+email|\s+account\s+email)'
         at_domain_english_match = re.search(at_domain_english_pattern, text)
         if at_domain_english_match:
-            domain = at_domain_english_match.group(1)
+            domain = self._sanitize_domain(at_domain_english_match.group(1))
             constraints["domain"] = domain
             return constraints
         
@@ -333,15 +354,15 @@ class EmailAddressConstraint:
         at_domain_mixed_pattern = r'@([a-zA-Z0-9.-]+)(\s*,\s*please|\s*로요\s*,\s*please|\s*형으로\s*,\s*please|\s*형로요\s*,\s*please)'
         at_domain_mixed_match = re.search(at_domain_mixed_pattern, text)
         if at_domain_mixed_match:
-            domain = at_domain_mixed_match.group(1)
+            domain = self._sanitize_domain(at_domain_mixed_match.group(1))
             constraints["domain"] = domain
             return constraints
         
         # 간단한 @도메인형 패턴 (조사나 형식 지정이 없는 경우) - 더 유연하게 수정
-        simple_at_domain_pattern = r'@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
+        simple_at_domain_pattern = r'@([a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})?)'
         simple_at_domain_match = re.search(simple_at_domain_pattern, text)
         if simple_at_domain_match:
-            domain = simple_at_domain_match.group(1)
+            domain = self._sanitize_domain(simple_at_domain_match.group(1))
             constraints["domain"] = domain
             return constraints
                 
@@ -362,7 +383,7 @@ class EmailAddressConstraint:
         for pattern in english_domain_patterns:
             match = re.search(pattern, text)
             if match:
-                domains.extend(match.groups())
+                domains.extend(self._sanitize_domain(g) for g in match.groups())
                 
         if len(domains) > 1:
             constraints["domain"] = domains

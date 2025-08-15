@@ -1,3 +1,4 @@
+import re
 from typing import List, Tuple, Optional
 from .mappings import KOR_TO_ENG_FIELD, EN_TO_TYPE_FIELD
 
@@ -29,6 +30,28 @@ class FieldDetector:
         # 추가: "minimum length" + "include" 같은 패턴은 password로 분류
         if ("minimum" in text.lower() or "length" in text.lower()) and ("include" in text.lower() or "special" in text.lower()):
             return "password"
+
+        # @ 패턴 감지 (이메일 도메인) - 높은 우선순위
+        email_patterns = [
+            r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',  # @domain.com
+            r'@[a-zA-Z0-9.-]+형',  # @domain형
+            r'@[a-zA-Z0-9.-]+\.',  # @domain.
+            r'@[a-zA-Z0-9.-]+(?:로|으로)\b',  # @domain로, @domain으로 (한글 조사 형태)
+        ]
+        for pattern in email_patterns:
+            match = re.search(pattern, text)
+            if match:
+                return "email_address"
+
+        # 도메인만으로도 이메일 인식 (naver.com, gmail.com 등)
+        domain_patterns = [
+            r'\b(?:naver\.com|gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|daum\.net|nate\.com|hanmail\.net|icloud\.com|protonmail\.com)\b',
+            r'\b(?:sejong\.ac\.kr|snu\.ac\.kr|korea\.ac\.kr|yonsei\.ac\.kr|kaist\.ac\.kr|postech\.ac\.kr|khu\.ac\.kr|hanyang\.ac\.kr|ewha\.ac\.kr|inha\.ac\.kr)\b',
+            r'\b(?:pusan\.ac\.kr|knu\.ac\.kr|cau\.ac\.kr|sogang\.ac\.kr|kookmin\.ac\.kr|ajou\.ac\.kr|chosun\.ac\.kr|kmu\.ac\.kr|dankook\.ac\.kr)\b',
+        ]
+        for pattern in domain_patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                return "email_address"
 
         # 한글 키워드
         for kor, eng in KOR_TO_ENG_FIELD.items():

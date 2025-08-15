@@ -159,6 +159,18 @@ KOR_TO_ENG_FIELD = {
     "postech.ac.kr으로요": "email_address", "khu.ac.kr으로요": "email_address", "hanyang.ac.kr으로요": "email_address", "ewha.ac.kr으로요": "email_address", "inha.ac.kr으로요": "email_address",
     "pusan.ac.kr으로요": "email_address", "knu.ac.kr으로요": "email_address", "cau.ac.kr으로요": "email_address", "sogang.ac.kr으로요": "email_address", "kookmin.ac.kr으로요": "email_address",
     "ajou.ac.kr으로요": "email_address", "chosun.ac.kr으로요": "email_address", "kmu.ac.kr으로요": "email_address", "dankook.ac.kr으로요": "email_address",
+    # 도메인만으로도 이메일 인식
+    "naver.com": "email_address", "gmail.com": "email_address", "yahoo.com": "email_address", "hotmail.com": "email_address", "outlook.com": "email_address",
+    "daum.net": "email_address", "nate.com": "email_address", "hanmail.net": "email_address", "icloud.com": "email_address", "protonmail.com": "email_address",
+    "sejong.ac.kr": "email_address", "snu.ac.kr": "email_address", "korea.ac.kr": "email_address", "yonsei.ac.kr": "email_address", "kaist.ac.kr": "email_address",
+    "postech.ac.kr": "email_address", "khu.ac.kr": "email_address", "hanyang.ac.kr": "email_address", "ewha.ac.kr": "email_address", "inha.ac.kr": "email_address",
+    "pusan.ac.kr": "email_address", "knu.ac.kr": "email_address", "cau.ac.kr": "email_address", "sogang.ac.kr": "email_address", "kookmin.ac.kr": "email_address",
+    "ajou.ac.kr": "email_address", "chosun.ac.kr": "email_address", "kmu.ac.kr": "email_address", "dankook.ac.kr": "email_address",
+    # @ 패턴 추가 (am.dk형, am.dk 등)
+    "@am.dk형": "email_address", "@am.dk": "email_address", "@am.dk.com": "email_address", "@am.dk.net": "email_address",
+    "@test.com": "email_address", "@example.com": "email_address", "@sample.com": "email_address",
+    "@company.com": "email_address", "@business.com": "email_address", "@corp.com": "email_address",
+    "@org.com": "email_address", "@edu.com": "email_address", "@gov.com": "email_address",
     "Naver email": "email_address", "Naver account email": "email_address", "Naver mail address": "email_address",
     "Naver email address": "email_address", "Naver domain email": "email_address", "Naver account mail": "email_address",
     "Naver ID email": "email_address", "Naver domain mail": "email_address",

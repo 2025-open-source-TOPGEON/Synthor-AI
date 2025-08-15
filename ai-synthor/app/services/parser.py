@@ -70,7 +70,7 @@ class Parser:
         ]
         has_korean_name = any(re.search(pattern, text) for pattern in korean_name_patterns)
         
-        # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
+        # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: EmailDomain > DateFormat > Nullable% > NumberBetween)
         datetime_indicators = [
             r'\b(?:format|date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
             r'\b(?:e\.?g\.?|example|sample|예시는|샘플|예|샘)[:\s]',
@@ -84,6 +84,16 @@ class Parser:
         ]
         
         is_datetime_text = any(re.search(pattern, text, re.I) for pattern in datetime_indicators)
+
+        # 이메일 도메인/패턴이 보이면 datetime 우선순위를 끈다
+        email_first_patterns = [
+            r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',    # @domain.com
+            r'@[a-zA-Z0-9.-]+형',                 # @domain형
+            r'@[a-zA-Z0-9.-]+(?:로|으로)\b',     # @domain로, @domain으로
+            r'\b(?:naver\.com|gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|daum\.net|nate\.com|hanmail\.net|icloud\.com|protonmail\.com)\b',
+        ]
+        if any(re.search(p, text, re.I) for p in email_first_patterns):
+            is_datetime_text = False
         
         # 나이 관련 키워드가 있으면 datetime으로 인식하지 않음
         if has_age_keyword:

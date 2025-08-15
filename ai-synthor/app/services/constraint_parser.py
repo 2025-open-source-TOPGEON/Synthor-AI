@@ -70,6 +70,16 @@ class Parser:
         
         is_datetime_text = any(re.search(pattern, text, re.I) for pattern in datetime_indicators)
         
+        # 이메일 도메인/패턴이 보이면 datetime 우선순위를 끈다
+        email_first_patterns = [
+            r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',    # @domain.com
+            r'@[a-zA-Z0-9.-]+형',                 # @domain형
+            r'@[a-zA-Z0-9.-]+(?:로|으로)\b',     # @domain로, @domain으로
+            r'\b(?:naver\.com|gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|daum\.net|nate\.com|hanmail\.net|icloud\.com|protonmail\.com)\b',
+        ]
+        if any(re.search(p, text, re.I) for p in email_first_patterns):
+            is_datetime_text = False
+        
         # 추가 날짜 감지: 날짜 패턴이 있으면 무조건 datetime
         date_patterns = [
             r'\d{4}[-/.]\d{1,2}[-/.]\d{1,2}',  # 2023-07-09, 2023/07/09
