@@ -1,4 +1,5 @@
 # app/services/parser.py
+import re
 from typing import Dict
 from .detectors import FieldDetector
 from .nullables import NullablePercentExtractor
@@ -37,18 +38,59 @@ class Parser:
             PasswordExtractor(), PhoneExtractor(), AvatarExtractor(),
             StateExtractor(), CountryExtractor(), DatetimeExtractor(),
             TimeExtractor(), UrlExtractor(), CreditCardNumberExtractor(),
-            CreditCardTypeExtractor(), ParagraphsExtractor(), NumberBetweenExtractor(),
-            KoreanFullNameExtractor(), KoreanLastNameExtractor(), EmailAddressConstraint()
+            CreditCardTypeExtractor(), ParagraphsExtractor(), 
+            KoreanFullNameExtractor(), KoreanLastNameExtractor(), EmailAddressConstraint(),
+            NumberBetweenExtractor()  # 숫자범위는 마지막에 배치
         ]:
             reg.register(ext)
         return reg
 
     def parse_field_constraint(self, text: str) -> Dict:
+        # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
+        datetime_indicators = [
+            r'\b(?:format|date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
+            r'\b(?:e\.?g\.?|example|sample|예시는|샘플|예|샘)[:\s]',
+            r'\d{4}[-/.]\d{1,2}[-/.]\d{1,2}',
+            r'\d{1,2}[-/.]\d{1,2}[-/.]\d{4}',
+            r'\d{2}[-/.]\d{1,2}[-/.]\d{1,2}',
+            r'\b(?:from|to|through|between|range|기간|조회기간|시작일|종료일|start|end)\b',
+            r'\b(?:nullable|빈값|결측|누락|use|포맷|형식|fmt)\b',
+            r'\b(?:d/m/yyyy|m/d/yyyy|mm/dd/yyyy|yyyy-mm-dd|yyyy-mm)\b',
+            r'\b(?:please|only|같은|형식|포맷만|설정)\b',
+        ]
+        
+        is_datetime_text = any(re.search(pattern, text, re.I) for pattern in datetime_indicators)
+        
+        # 추가 날짜 감지: 날짜 패턴이 있으면 무조건 datetime
+        date_patterns = [
+            r'\d{4}[-/.]\d{1,2}[-/.]\d{1,2}',  # 2023-07-09, 2023/07/09
+            r'\d{1,2}[-/.]\d{1,2}[-/.]\d{4}',  # 25/12/2023, 12/25/2023
+            r'\d{2}[-/.]\d{1,2}[-/.]\d{1,2}',  # 23/12/25
+            r'\d{4}[-/.]\d{1,2}',  # 2023-01, 2023.1
+        ]
+        has_date_pattern = any(re.search(pattern, text) for pattern in date_patterns)
+        
+        # 날짜 패턴이 있으면 무조건 datetime으로 설정
+        if has_date_pattern:
+            is_datetime_text = True
+        
+        # 더 강력한 날짜 감지: 숫자-숫자-숫자 패턴이 있으면 무조건 datetime
+        if re.search(r'\d+[-/.]\d+[-/.]\d+', text):
+            is_datetime_text = True
+        
         field = self.detector.detect_first(text)
         if not field:
-            return {"type": None, "constraints": {}, "nullablePercent": None}
+            if is_datetime_text:
+                field = "datetime"
+            else:
+                return {"type": None, "constraints": {}, "nullablePercent": None}
 
-        extractor = self.registry.get(field) or self.default_extractor
+        # 날짜 관련 텍스트면 datetime 타입으로 강제 (FieldDetector 결과 무시)
+        if is_datetime_text:
+            field = "datetime"
+            extractor = self.registry.get("datetime") or self.default_extractor
+        else:
+            extractor = self.registry.get(field) or self.default_extractor
 
         # 1) 타입별 constraints - korean_* 타입들을 해당 타입으로 변환
         if field == "korean_phone":
