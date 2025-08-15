@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, List
 from fastapi import APIRouter, HTTPException, Body
 from pydantic import BaseModel, Field
 
-from app.services.parser import Parser  # Parser 클래스
+from app.services.constraint_parser import Parser  # constraint_parser의 Parser 클래스
 
 router = APIRouter()
 parser = Parser()
