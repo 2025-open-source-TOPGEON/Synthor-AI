@@ -338,7 +338,7 @@ class EmailAddressConstraint:
             return constraints
         
         # 간단한 @도메인형 패턴 (조사나 형식 지정이 없는 경우) - 더 유연하게 수정
-        simple_at_domain_pattern = r'@([a-zA-Z0-9.-]+)'
+        simple_at_domain_pattern = r'@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
         simple_at_domain_match = re.search(simple_at_domain_pattern, text)
         if simple_at_domain_match:
             domain = simple_at_domain_match.group(1)

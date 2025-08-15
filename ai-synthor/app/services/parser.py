@@ -50,6 +50,10 @@ class Parser:
         age_keywords = ['나이', '연령', '연령대', '나이대', '세', '살', 'age']
         has_age_keyword = any(keyword in text for keyword in age_keywords)
         
+        # 이메일 도메인 패턴이 있으면 datetime으로 인식하지 않음
+        email_domain_patterns = [r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', r'@[a-zA-Z0-9.-]+형']
+        has_email_domain = any(re.search(pattern, text, re.I) for pattern in email_domain_patterns)
+        
         # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
         datetime_indicators = [
             r'\b(?:format|date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
@@ -60,13 +64,17 @@ class Parser:
             r'\b(?:from|to|through|between|range|기간|조회기간|시작일|종료일|start|end)\b',
             r'\b(?:nullable|빈값|결측|누락|use|포맷|형식|fmt)\b',
             r'\b(?:d/m/yyyy|m/d/yyyy|mm/dd/yyyy|yyyy-mm-dd|yyyy-mm)\b',
-            r'\b(?:please|only|같은|형식|포맷만|설정)\b',
+            r'\b(?:only|같은|형식|포맷만|설정)\b',
         ]
         
         is_datetime_text = any(re.search(pattern, text, re.I) for pattern in datetime_indicators)
         
         # 나이 관련 키워드가 있으면 datetime으로 인식하지 않음
         if has_age_keyword:
+            is_datetime_text = False
+            
+        # 이메일 도메인 패턴이 있으면 datetime으로 인식하지 않음
+        if has_email_domain:
             is_datetime_text = False
         
         # 추가 날짜 감지: 날짜 패턴이 있으면 무조건 datetime
