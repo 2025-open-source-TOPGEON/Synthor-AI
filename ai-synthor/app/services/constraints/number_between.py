@@ -253,9 +253,8 @@ class NumberBetweenExtractor(ConstraintExtractor):
         if c["min"] > c["max"]:
             c["min"], c["max"] = c["max"], c["min"]
 
-        # Remove hard clamping to allow values outside 1-100 range
-        c["min"] = float(c["min"])
-        c["max"] = float(c["max"])
+        c["min"] = max(1, min(100, float(c["min"])))
+        c["max"] = max(1, min(100, float(c["max"])))
 
         if c["decimals"] == 0:
             def _maybe_int(x):

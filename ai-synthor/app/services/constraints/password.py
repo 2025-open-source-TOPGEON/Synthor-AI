@@ -23,34 +23,8 @@ class PasswordExtractor(ConstraintExtractor):
                 # 포함 패턴으로 매치된 경우 기본값 1 반환
                 return 1
 
-        def pick_range(m):
-            """범위 패턴 (예: 6자리에서 16자리)에서 두 번째 숫자를 반환"""
-            if not m:
-                return None
-            groups = list(filter(None, m.groups()))
-            if len(groups) >= 2:
-                # 두 번째 숫자를 max_length로 사용
-                for group in groups[1:]:
-                    if group.isdigit():
-                        return int(group)
-            return None
-
-        def pick_min_range(m):
-            """범위 패턴 (예: 6자리에서 16자리)에서 첫 번째 숫자를 반환"""
-            if not m:
-                return None
-            groups = list(filter(None, m.groups()))
-            if len(groups) >= 2:
-                # 첫 번째 숫자를 min_length로 사용
-                for group in groups[:1]:
-                    if group.isdigit():
-                        return int(group)
-            return None
-
         #최소 길이 (숫자 명시형만, ≥N)
         m_min = re.search(
-            r'(\d+)\s*(?:자|글자|자리)\s*이상\s*(\d+)\s*(?:자|글자|자리)\s*이하|'  # 8자 이상 20자 이하 (첫 번째 숫자)
-            r'(\d+)\s*(?:자|글자|자리)\s*에서\s*(\d+)\s*(?:자|글자|자리)|'  # 6자리에서 16자리 (첫 번째 숫자)
             r'(?:최소|적어도)\s*(\d+)\s*(?:자|글자|자리)|'            # 최소 10자
             r'(\d+)\s*(?:자|글자|자리)\s*(?:이상)|'                  # 10자 이상
             r'최소\s*길이(?:가)?[:\s]*(\d+)|길이\s*최소[:\s]*(\d+)|'  # 최소 길이(가) 10 / 길이 최소 10
@@ -68,30 +42,6 @@ class PasswordExtractor(ConstraintExtractor):
             r'(\d+)\s*(?:chars?|characters?)\s*(?:or\s*more|or\s*longer)|'  # 10 characters or more
             r'(\d+)\s*(?:자|글자|자리)\s*이상|'                      # 10자 이상 (다른 패턴)
             r'(\d+)\s*(?:chars?|characters?)\s*이상',               # 10 characters 이상
-            text, re.I
-        )
-
-        #최대 길이 (숫자 명시형만, ≤N)
-        m_max = re.search(
-            r'(?:최대|많아야)\s*(\d+)\s*(?:자|글자|자리)|'            # 최대 20자
-            r'(\d+)\s*(?:자|글자|자리)\s*(?:이하)|'                  # 20자 이하
-            r'최대\s*길이(?:가)?[:\s]*(\d+)|길이\s*최대[:\s]*(\d+)|'  # 최대 길이(가) 20 / 길이 최대 20
-            r'최대\s*length\s*(\d+)\s*이하|'                        # 최대 length 20 이하
-            r'length\s*는\s*(\d+)\s*이하|'                          # length는 20 이하
-            r'max(?:imum)?(?:\s*length)?[:\s]*(\d+)|'               # maximum length: 20
-            r'max(?:imum)?\s*length\s*of\s*(\d+)|'                  # maximum length of 20
-            r'length\s*(?:at\s*most|<=)\s*(\d+)|'                   # length at most 20 / length <= 20
-            r'length\s*must\s*be\s*(\d+)\s*or\s*less|'              # length must be 20 or less
-            r'(\d+)\s*or\s*less\s*(?:chars?|characters?)|'          # 20 or less characters
-            r'(\d+)\s*or\s*shorter|'                                # 20 or shorter
-            r'(?:at\s*most|no\s*more\s*than)\s*(\d+)\s*(?:chars?|characters?|letters?)|'
-            r'max[:\s]*(\d+)\s*(?:chars?|characters?)|'             # max 20 chars
-            r'(\d+)\s*(?:자|글자|자리)\s*(?:이하|또는\s*더\s*적게)|'  # 20자 이하 또는 더 적게
-            r'(\d+)\s*(?:chars?|characters?)\s*(?:or\s*less|or\s*shorter)|'  # 20 characters or less
-            r'(\d+)\s*(?:자|글자|자리)\s*이하|'                      # 20자 이하 (다른 패턴)
-            r'(\d+)\s*(?:chars?|characters?)\s*이하|'               # 20 characters 이하
-            r'(\d+)\s*(?:자|글자|자리)\s*에서\s*(\d+)\s*(?:자|글자|자리)|'  # 6자리에서 16자리
-            r'(\d+)\s*(?:자|글자|자리)\s*이상\s*(\d+)\s*(?:자|글자|자리)\s*이하',  # 8자 이상 20자 이하
             text, re.I
         )
 
@@ -209,7 +159,6 @@ class PasswordExtractor(ConstraintExtractor):
 
         categories = {
             "minimum_length": m_min,
-            "max_length": m_max,
             "upper": m_up, 
             "lower": m_low,
             "numbers": m_num,
@@ -218,17 +167,7 @@ class PasswordExtractor(ConstraintExtractor):
         
         for category, match in categories.items():
             if match:
-                if category == "max_length":
-                    val = pick_range(match)
-                elif category == "minimum_length":
-                    # 범위 패턴인 경우에만 pick_min_range 사용
-                    groups = list(filter(None, match.groups()))
-                    if len(groups) >= 2:
-                        val = pick_min_range(match)  # 첫 번째 숫자를 minimum_length로 사용
-                    else:
-                        val = pick(match)  # 단일 숫자인 경우
-                else:
-                    val = pick(match)
+                val = pick(match)
                 if val is not None:
                     c[category] = val
         

@@ -61,24 +61,18 @@ class AvatarExtractor(ConstraintExtractor):
         # png, bmp, jpg만 허용
         fmt_map = {
             "png": r'\bpng\b|png\s*형식|png\s*포맷|png\s*로\s*저장|format\s*[:=]?\s*png',
-            "bmp": r'\bbmp\b|bmp\s*형식|bmp\s*포맷|bmp\s*로\s*저장|format\s*[:=]?\s*bmp',
-            "jpg": r'\bjpg\b|\bjpeg\b|jpe?g\s*형식|jpg\s*포맷|jpe?g\s*로\s*저장|format\s*[:=]?\s*(?:jpg|jpeg)',
+            "bmp": r'\bbmp\b|bmp\s*형식|bmp\s*포맷|format\s*[:=]?\s*bmp',
+            "jpg": r'\bjpg\b|\bjpeg\b|jpe?g\s*형식|jpg\s*포맷|format\s*[:=]?\s*(?:jpg|jpeg)',
         }
 
-        # 여러 형식 찾기
-        found_formats = []
+        earliest = None  # (pos, norm_fmt)
         for norm_fmt, pat in fmt_map.items():
             for mfmt in re.finditer(pat, t, flags=re.I):
-                if norm_fmt not in found_formats:
-                    found_formats.append(norm_fmt)
+                pos = mfmt.start()
+                if earliest is None or pos < earliest[0]:
+                    earliest = (pos, norm_fmt)
 
-        if found_formats:
-            if len(found_formats) == 1:
-                c["format"] = found_formats[0]
-            else:
-                # 순서를 맞추기 위해 정렬 (jpg, png, bmp 순서)
-                format_order = {"jpg": 0, "png": 1, "bmp": 2}
-                sorted_formats = sorted(found_formats, key=lambda x: format_order.get(x, 3))
-                c["format"] = sorted_formats
+        if earliest:
+            c["format"] = earliest[1]
 
         return c

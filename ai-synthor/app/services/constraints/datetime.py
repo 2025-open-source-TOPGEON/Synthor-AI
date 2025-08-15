@@ -210,11 +210,7 @@ class DatetimeExtractor(ConstraintExtractor):
             + date_pattern + r'\s*부터|'
             r'(?:>=|on or after|이후|이상)\s*' + date_pattern + r'|'
             r'시작\s*' + date_pattern + r'|'
-            r'기준일\s*이후\s*(?:[:=]|은|는)?\s*' + date_pattern + r'|'
-            r'(?:생년월일|가입일|등록일시|생일|가입|등록)\s*(?:은|는)\s*' + date_pattern + r'\s*부터|'
-            r'(?:생년월일|가입일|등록일시|생일|가입|등록)\s*(?:은|는)\s*(\d{4})\s*년\s*부터|'
-            r'(?:생년월일|가입일|등록일시|생일|가입|등록)\s*(?:은|는)\s*(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*부터|'
-            r'(?:생년월일|가입일|등록일시|생일|가입|등록)\s*(?:은|는)\s*(\d{4})\s*년\s*(\d{1,2})\s*월\s*부터',
+                r'기준일\s*이후\s*(?:[:=]|은|는)?\s*' + date_pattern,
                 t, re.I
             )
             m_to = re.search(
@@ -224,50 +220,14 @@ class DatetimeExtractor(ConstraintExtractor):
             r'(?:end\s*date|end|종료(?:일| 날짜)?)\s*(?:[:=]|은|는)?\s*' + date_pattern + r'|'
             r'(?:부터|이후|뒤)?\s*' + date_pattern + r'\s*까지|'
             r'(?:<=|on or before|이전|이하)\s*' + date_pattern + r'|'
-            r'종료\s*' + date_pattern + r'|'
-            r'까지\s*' + date_pattern + r'|'
-            r'(\d{4})\s*년\s*까지|'
-            r'(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*까지|'
-            r'(\d{4})\s*년\s*(\d{1,2})\s*월\s*까지',
+                r'종료\s*' + date_pattern,
                 t, re.I
             )
             
             if m_from:
-                groups = list(filter(None, m_from.groups()))
-                if len(groups) == 1:  # "1990년부터"
-                    year = groups[0]
-                    from_value = f"{year}-01-01"
-                elif len(groups) == 2:  # "2023년 1월부터"
-                    year, month = groups[0], groups[1]
-                    from_value = f"{year}-{int(month):02d}-01"
-                elif len(groups) == 3:  # "2020년 1월 1일부터"
-                    year, month, day = groups[0], groups[1], groups[2]
-                    from_value = f"{year}-{int(month):02d}-{int(day):02d}"
-                else:  # 기존 패턴
-                    from_value = validate_and_correct_date(groups[0])
+                from_value = validate_and_correct_date(next(filter(None, m_from.groups())))
             if m_to:
-                groups = list(filter(None, m_to.groups()))
-                if len(groups) == 1:  # "2010년까지"
-                    year = groups[0]
-                    to_value = f"{year}-12-31"
-                elif len(groups) == 2:  # "2024년 6월까지"
-                    year, month = groups[0], groups[1]
-                    # 해당 월의 마지막 날 계산
-                    if int(month) in [1, 3, 5, 7, 8, 10, 12]:
-                        max_day = 31
-                    elif int(month) in [4, 6, 9, 11]:
-                        max_day = 30
-                    else:  # 2월
-                        if (int(year) % 4 == 0 and int(year) % 100 != 0) or (int(year) % 400 == 0):
-                            max_day = 29
-                        else:
-                            max_day = 28
-                    to_value = f"{year}-{int(month):02d}-{max_day:02d}"
-                elif len(groups) == 3:  # "2024년 12월 31일까지"
-                    year, month, day = groups[0], groups[1], groups[2]
-                    to_value = f"{year}-{int(month):02d}-{int(day):02d}"
-                else:  # 기존 패턴
-                    to_value = validate_and_correct_date(groups[0])
+                to_value = validate_and_correct_date(next(filter(None, m_to.groups())))
 
         c = {}
         if from_value:
@@ -578,8 +538,6 @@ class DatetimeExtractor(ConstraintExtractor):
             # 범위가 있는 경우에만 granularity 추가
             if "from" in result and "to" in result:
                 result["granularity"] = "month"
-        # 하지만 테스트 케이스에서는 yyyy-mm 형식이어도 min_date/max_date는 yyyy-mm-dd 형식이어야 함
-        # constraint_parser.py에서 from/to를 min_date/max_date로 변환할 때 yyyy-mm-dd 형식으로 변환
         # 연-월만 있는 경우 (2023-01, 2023.1, 2023/1) 처리
         elif "from" in result and re.match(r'^\d{4}$', result["from"]):
             # from이 연도만 있는 경우 (2023) → 2023-01-01로 수정
