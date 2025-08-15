@@ -51,8 +51,24 @@ class Parser:
         has_age_keyword = any(keyword in text for keyword in age_keywords)
         
         # 이메일 도메인 패턴이 있으면 datetime으로 인식하지 않음
-        email_domain_patterns = [r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', r'@[a-zA-Z0-9.-]+형']
+        email_domain_patterns = [
+            r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',  # @domain.com
+            r'@[a-zA-Z0-9.-]+형',  # @domain형
+            r'\b(?:naver\.com|gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|daum\.net|nate\.com|hanmail\.net|icloud\.com|protonmail\.com)\b',  # 일반 도메인
+            r'\b(?:naver|gmail|yahoo|hotmail|outlook|daum|nate|hanmail|icloud|protonmail)\s+account\b',  # 도메인 account
+            r'\b(?:naver|gmail|yahoo|hotmail|outlook|daum|nate|hanmail|icloud|protonmail)\s+mail\b',  # 도메인 mail
+            r'\b(?:naver|gmail|yahoo|hotmail|outlook|daum|nate|hanmail|icloud|protonmail)\s+email\b',  # 도메인 email
+        ]
         has_email_domain = any(re.search(pattern, text, re.I) for pattern in email_domain_patterns)
+        
+        # 한국어 이름 패턴이 있으면 datetime으로 인식하지 않음
+        korean_name_patterns = [
+            r'성이\s*[가-힣]{1,2}',  # 성이 김, 성이 이, 성이 박 등
+            r'성씨가\s*[가-힣]{1,2}',  # 성씨가 김, 성씨가 이 등
+            r'[가-힣]{1,2}씨',  # 김씨, 이씨, 박씨 등
+            r'[가-힣]{1,2}\s*성',  # 김 성, 이 성 등
+        ]
+        has_korean_name = any(re.search(pattern, text) for pattern in korean_name_patterns)
         
         # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
         datetime_indicators = [
@@ -75,6 +91,10 @@ class Parser:
             
         # 이메일 도메인 패턴이 있으면 datetime으로 인식하지 않음
         if has_email_domain:
+            is_datetime_text = False
+            
+        # 한국어 이름 패턴이 있으면 datetime으로 인식하지 않음
+        if has_korean_name:
             is_datetime_text = False
         
         # 추가 날짜 감지: 날짜 패턴이 있으면 무조건 datetime
