@@ -206,18 +206,18 @@ class DatetimeExtractor(ConstraintExtractor):
             m_from = re.search(
             r'from\s*' + date_pattern + r'|'
             r'since\s*' + date_pattern + r'|'
-            r'(?:start\s*date|start|시작(?:일| 날짜)?)\s*[:=]?\s*' + date_pattern + r'|'
+            r'(?:start\s*date|start|시작(?:일| 날짜)?)\s*(?:[:=]|은|는)?\s*' + date_pattern + r'|'
             + date_pattern + r'\s*부터|'
             r'(?:>=|on or after|이후|이상)\s*' + date_pattern + r'|'
             r'시작\s*' + date_pattern + r'|'
-                r'기준일\s*이후\s*[:=]?\s*' + date_pattern,
+                r'기준일\s*이후\s*(?:[:=]|은|는)?\s*' + date_pattern,
                 t, re.I
             )
             m_to = re.search(
             r'to\s*' + date_pattern + r'|'
             r'until\s*' + date_pattern + r'|'
             r'through\s*' + date_pattern + r'|'
-            r'(?:end\s*date|end|종료(?:일| 날짜)?)\s*[:=]?\s*' + date_pattern + r'|'
+            r'(?:end\s*date|end|종료(?:일| 날짜)?)\s*(?:[:=]|은|는)?\s*' + date_pattern + r'|'
             r'(?:부터|이후|뒤)?\s*' + date_pattern + r'\s*까지|'
             r'(?:<=|on or before|이전|이하)\s*' + date_pattern + r'|'
                 r'종료\s*' + date_pattern,
@@ -491,6 +491,21 @@ class DatetimeExtractor(ConstraintExtractor):
                         # 연-월만 있는 경우 포맷을 yyyy-mm-dd로 설정
                         if "format" not in result or result["format"] == "yyyy-mm":
                             result["format"] = "yyyy-mm-dd"
+                    # 한글 연월만 있는 경우 처리 (2023년 1월 → 2023-01-01)
+                    elif re.match(r'^\d{4}\s*년\s*\d{1,2}\s*월$', date_str):
+                        year_match = re.search(r'(\d{4})\s*년', date_str)
+                        month_match = re.search(r'(\d{1,2})\s*월', date_str)
+                        if year_match and month_match:
+                            year, month = int(year_match.group(1)), int(month_match.group(1))
+                            # 월 검증 및 보정
+                            if month < 1:
+                                month = 1
+                            elif month > 12:
+                                month = 12
+                            date_str = f"{year:04d}-{month:02d}-01"  # 1일로 설정
+                            # 연-월만 있는 경우 포맷을 yyyy-mm-dd로 설정
+                            if "format" not in result or result["format"] == "yyyy-mm":
+                                result["format"] = "yyyy-mm-dd"
                     
                     corrected_date = validate_and_correct_date(date_str)
                     result["from"] = corrected_date
@@ -514,12 +529,15 @@ class DatetimeExtractor(ConstraintExtractor):
             result["to"] = self._normalize_date_format(result["to"], result.get("format", "yyyy-mm-dd"))
         
         # yyyy-mm 형식인 경우 granularity 추가 및 day 제거
+        # 단, 범위(from/to)가 있는 경우에만 granularity 추가
         if result.get("format") == "yyyy-mm":
             if "from" in result and result["from"].endswith("-01"):
                 result["from"] = result["from"][:-3]  # -01 제거
             if "to" in result and result["to"].endswith("-01"):
                 result["to"] = result["to"][:-3]  # -01 제거
-            result["granularity"] = "month"
+            # 범위가 있는 경우에만 granularity 추가
+            if "from" in result and "to" in result:
+                result["granularity"] = "month"
         # 연-월만 있는 경우 (2023-01, 2023.1, 2023/1) 처리
         elif "from" in result and re.match(r'^\d{4}$', result["from"]):
             # from이 연도만 있는 경우 (2023) → 2023-01-01로 수정

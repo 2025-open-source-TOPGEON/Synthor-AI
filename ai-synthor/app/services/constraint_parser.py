@@ -46,14 +46,24 @@ class Parser:
     def parse_field_constraint(self, text: str) -> Dict:
         # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
         import re
+        
+        # 나이/연령 키워드가 있으면 number_between_1_100으로 우선 처리
+        age_keywords = [r'\b(?:나이|연령|age)\b']
+        is_age_text = any(re.search(pattern, text, re.I) for pattern in age_keywords)
+        
+        # integer 키워드가 나이/연령과 함께 있으면 숫자로 인식
+        integer_age_pattern = r'\b(?:integer|정수)\s+(?:나이|연령|age)\b'
+        is_integer_age = bool(re.search(integer_age_pattern, text, re.I))
+        
         datetime_indicators = [
             r'\b(?:format|date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
             r'\b(?:e\.?g\.?|example|sample|예시는|샘플|예|샘)[:\s]',
             r'\d{4}[-/.]\d{1,2}[-/.]\d{1,2}',
             r'\d{1,2}[-/.]\d{1,2}[-/.]\d{4}',
             r'\d{2}[-/.]\d{1,2}[-/.]\d{1,2}',
-            r'\b(?:from|to|through|between|range|기간|조회기간|시작일|종료일|start|end)\b',
-            r'\b(?:nullable|빈값|결측|누락|use|포맷|형식|fmt)\b',
+            # 나이/연령 컨텍스트가 아닐 때만 from/to/between을 날짜로 인식
+            r'(?<!나이|연령)\b(?:from|to|through|between|range|기간|조회기간|시작일|종료일|start|end)\b(?!\s*\d+)',
+            r'\b(?:use|포맷|형식|fmt)\b',  # nullable 제거
             r'\b(?:d/m/yyyy|m/d/yyyy|mm/dd/yyyy|yyyy-mm-dd|yyyy-mm)\b',
             r'\b(?:please|only|같은|형식|포맷만|설정)\b',
         ]
@@ -74,7 +84,8 @@ class Parser:
             is_datetime_text = True
         
         # 더 강력한 날짜 감지: 숫자-숫자-숫자 패턴이 있으면 무조건 datetime
-        if re.search(r'\d+[-/.]\d+[-/.]\d+', text):
+        # 단, 나이/연령 키워드가 있으면 제외
+        if not is_age_text and not is_integer_age and re.search(r'\d+[-/.]\d+[-/.]\d+', text):
             is_datetime_text = True
         
         field = self.detector.detect_first(text)
@@ -85,7 +96,8 @@ class Parser:
                 return {"type": None, "constraints": {}, "nullablePercent": None}
 
         # 날짜 관련 텍스트면 datetime 타입으로 강제 (FieldDetector 결과 무시)
-        if is_datetime_text:
+        # 단, 나이/연령 키워드가 있으면 number_between_1_100으로 유지
+        if is_datetime_text and not is_age_text and not is_integer_age:
             field = "datetime"
             extractor = self.registry.get("datetime") or self.default_extractor
         else:
