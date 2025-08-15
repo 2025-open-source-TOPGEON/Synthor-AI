@@ -47,6 +47,232 @@ class Parser:
         # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
         import re
         
+        # 문단/단락 키워드가 있으면 paragraphs로 우선 처리
+        paragraph_keywords = [
+            r'\b(?:문단|단락|paragraphs?|sections?|blocks?\s*of\s*text)\b',
+            r'\b(?:text\s*paragraphs?|body\s*paragraphs?|content\s*paragraphs?)\b',
+            r'\b(?:written\s*paragraphs?|textual\s*paragraphs?|paragraph\s*units?|paragraph\s*blocks?)\b',
+            r'\b(?:paragraph\s*count|number\s*of\s*paragraphs?|paragraph\s*structure)\b',
+            r'\b(?:본문|글의\s*문단|본문\s*단락|글\s*단락|글의\s*문단\s*수|본문\s*구성\s*단락)\b',
+            r'\b(?:단락\s*수|문단\s*수|글의\s*각\s*단락|본문의\s*각\s*문단|글의\s*내용\s*단락)\b',
+            r'\b(?:문단\s*개수|문단\s*수는|문단\s*개수를|문단\s*수를|문단\s*개수는)\b',
+            r'\b(?:문단으로\s*구성|문단으로\s*작성|문단을\s*작성|문단으로\s*맞춰|문단으로\s*유지|문단으로\s*제한)\b',
+            r'\b(?:문단은\s*총|문단\s*수는\s*총|문단\s*개수는\s*총|문단은\s*정확히|문단\s*수는\s*정확히|문단\s*개수는\s*정확히)\b',
+            r'\b(?:문단을\s*총|문단을\s*정확히|문단은\s*최소|문단은\s*최대|문단\s*수는\s*최소|문단\s*수는\s*최대)\b',
+            r'\b(?:문단\s*개수는\s*최소|문단\s*개수는\s*최대|본문은\s*최소|본문은\s*최대)\b',
+            # 더 구체적인 패턴들 추가
+            r'\d+\s*~?\s*\d+\s*개의?\s*문단',
+            r'\d+\s*-\s*\d+\s*개의?\s*문단',
+            r'\d+\s*에서\s*\d+\s*개의?\s*문단',
+            r'between\s*\d+\s*and\s*\d+\s*paragraphs?',
+            r'\d+\s*to\s*\d+\s*paragraphs?',
+            r'from\s*\d+\s*to\s*\d+\s*paragraphs?',
+            r'\d+\s*–\s*\d+\s*paragraphs?',
+            r'최소\s*\d+\s*최대\s*\d+\s*개의?\s*문단',
+            r'at\s*least\s*\d+\s*no\s*more\s*than\s*\d+\s*paragraphs?',
+            r'문단.*\d+\s*개.*\d+\s*개',
+            r'paragraphs?.*\d+.*\d+',
+            r'본문.*\d+\s*개.*\d+\s*개',
+            r'본문.*\d+\s*이상.*\d+\s*이하',
+            # 더 구체적인 패턴들
+            r'최소\s*\d+\s*최대\s*\d+\s*개의?\s*문단',
+            r'at\s*least\s*\d+\s*no\s*more\s*than\s*\d+\s*paragraphs?',
+            r'문단.*최소.*최대',
+            r'paragraphs?.*minimum.*maximum',
+            r'문단.*at\s*least.*no\s*more\s*than',
+            r'본문.*\d+\s*개.*\d+\s*개.*문단',
+            r'본문.*\d+\s*이상.*\d+\s*이하.*문단',
+            r'문단.*\d+\s*이상.*\d+\s*이하',
+            r'paragraphs?.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*–\s*\d+',
+            r'paragraphs?.*\d+\s*–\s*\d+',
+            # 더 강력한 패턴들
+            r'최소\s*\d+\s*최대\s*\d+\s*개의?\s*문단',
+            r'at\s*least\s*\d+\s*no\s*more\s*than\s*\d+\s*paragraphs?',
+            r'문단.*최소.*최대',
+            r'paragraphs?.*minimum.*maximum',
+            r'문단.*at\s*least.*no\s*more\s*than',
+            r'본문.*\d+\s*개.*\d+\s*개.*문단',
+            r'본문.*\d+\s*이상.*\d+\s*이하.*문단',
+            r'문단.*\d+\s*이상.*\d+\s*이하',
+            r'paragraphs?.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*–\s*\d+',
+            r'paragraphs?.*\d+\s*–\s*\d+',
+            # 추가 강력한 패턴들
+            r'문단.*\d+\s*개.*\d+\s*개',
+            r'paragraphs?.*\d+.*\d+',
+            r'본문.*\d+\s*개.*\d+\s*개',
+            r'본문.*\d+\s*이상.*\d+\s*이하',
+            r'문단.*\d+\s*개.*\d+\s*개',
+            r'paragraphs?.*\d+.*\d+',
+            r'본문.*\d+\s*개.*\d+\s*개',
+            r'본문.*\d+\s*이상.*\d+\s*이하',
+            # 더 강력한 패턴들 추가
+            r'최소\s*\d+\s*최대\s*\d+\s*개의?\s*문단',
+            r'at\s*least\s*\d+\s*no\s*more\s*than\s*\d+\s*paragraphs?',
+            r'문단.*최소.*최대',
+            r'paragraphs?.*minimum.*maximum',
+            r'문단.*at\s*least.*no\s*more\s*than',
+            r'본문.*\d+\s*개.*\d+\s*개.*문단',
+            r'본문.*\d+\s*이상.*\d+\s*이하.*문단',
+            r'문단.*\d+\s*이상.*\d+\s*이하',
+            r'paragraphs?.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*–\s*\d+',
+            r'paragraphs?.*\d+\s*–\s*\d+',
+            # 영어 숫자 표현 포함
+            r'between\s*(?:three|four|five|six|seven|eight|nine|ten)\s*and\s*(?:three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
+            r'at\s*least\s*(?:three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
+            r'no\s*more\s*than\s*(?:three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
+            r'exactly\s*(?:three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
+            r'precisely\s*(?:three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
+            r'minimum\s*of\s*(?:three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
+            r'maximum\s*of\s*(?:three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
+            # 더 구체적인 패턴들
+            r'문단.*\d+\s*개.*\d+\s*개.*문단',
+            r'paragraphs?.*\d+.*\d+.*paragraphs?',
+            r'본문.*\d+\s*개.*\d+\s*개.*문단',
+            r'본문.*\d+\s*이상.*\d+\s*이하.*문단',
+            r'문단.*\d+\s*이상.*\d+\s*이하',
+            r'paragraphs?.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*–\s*\d+',
+            r'paragraphs?.*\d+\s*–\s*\d+',
+            # 최소/최대 패턴들
+            r'최소\s*\d+\s*최대\s*\d+\s*개의?\s*문단',
+            r'at\s*least\s*\d+\s*no\s*more\s*than\s*\d+\s*paragraphs?',
+            r'문단.*최소.*최대',
+            r'paragraphs?.*minimum.*maximum',
+            r'문단.*at\s*least.*no\s*more\s*than',
+            r'본문.*\d+\s*개.*\d+\s*개.*문단',
+            r'본문.*\d+\s*이상.*\d+\s*이하.*문단',
+            r'문단.*\d+\s*이상.*\d+\s*이하',
+            r'paragraphs?.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*to\s*\d+',
+            r'문단.*\d+\s*–\s*\d+',
+            r'paragraphs?.*\d+\s*–\s*\d+',
+            # 추가 패턴들 - 더 포괄적인 문단 감지
+            r'문단\s*개수',
+            r'문단\s*수',
+            r'문단\s*개',
+            r'문단\s*개로',
+            r'문단\s*개를',
+            r'문단\s*개가',
+            r'문단\s*개는',
+            r'문단\s*개에',
+            r'문단\s*개와',
+            r'문단\s*개와\s*함께',
+            r'문단\s*개\s*포함',
+            r'문단\s*개\s*작성',
+            r'문단\s*개\s*구성',
+            r'문단\s*개\s*제한',
+            r'문단\s*개\s*범위',
+            r'문단\s*개\s*사이',
+            r'문단\s*개\s*이상',
+            r'문단\s*개\s*이하',
+            r'문단\s*개\s*정확히',
+            r'문단\s*개\s*정확한',
+            r'문단\s*개\s*고정',
+            r'문단\s*개\s*동일',
+            r'문단\s*개\s*같은',
+            r'문단\s*개\s*최소',
+            r'문단\s*개\s*최대',
+            r'문단\s*개\s*at\s*least',
+            r'문단\s*개\s*no\s*more\s*than',
+            r'문단\s*개\s*between',
+            r'문단\s*개\s*from',
+            r'문단\s*개\s*to',
+            r'문단\s*개\s*and',
+            r'문단\s*개\s*or',
+            r'문단\s*개\s*또는',
+            r'문단\s*개\s*그리고',
+            r'문단\s*개\s*포함해주세요',
+            r'문단\s*개\s*포함해\s*주세요',
+            r'문단\s*개\s*작성해주세요',
+            r'문단\s*개\s*작성해\s*주세요',
+            r'문단\s*개\s*구성해주세요',
+            r'문단\s*개\s*구성해\s*주세요',
+            r'문단\s*개\s*제한됩니다',
+            r'문단\s*개\s*제한',
+            r'문단\s*개\s*범위',
+            r'문단\s*개\s*사이',
+            r'문단\s*개\s*이상',
+            r'문단\s*개\s*이하',
+            r'문단\s*개\s*정확히',
+            r'문단\s*개\s*정확한',
+            r'문단\s*개\s*고정',
+            r'문단\s*개\s*동일',
+            r'문단\s*개\s*같은',
+            r'문단\s*개\s*최소',
+            r'문단\s*개\s*최대',
+            r'문단\s*개\s*at\s*least',
+            r'문단\s*개\s*no\s*more\s*than',
+            r'문단\s*개\s*between',
+            r'문단\s*개\s*from',
+            r'문단\s*개\s*to',
+            r'문단\s*개\s*and',
+            r'문단\s*개\s*or',
+            r'문단\s*개\s*또는',
+            r'문단\s*개\s*그리고',
+            # 더 간단하고 포괄적인 패턴들
+            r'문단',
+            r'paragraphs?',
+            r'단락',
+            r'sections?',
+            r'blocks?\s*of\s*text',
+            r'text\s*paragraphs?',
+            r'body\s*paragraphs?',
+            r'content\s*paragraphs?',
+            r'written\s*paragraphs?',
+            r'textual\s*paragraphs?',
+            r'paragraph\s*units?',
+            r'paragraph\s*blocks?',
+            r'paragraph\s*count',
+            r'number\s*of\s*paragraphs?',
+            r'paragraph\s*structure',
+            r'본문',
+            r'글의\s*문단',
+            r'본문\s*단락',
+            r'글\s*단락',
+            r'글의\s*문단\s*수',
+            r'본문\s*구성\s*단락',
+            r'단락\s*수',
+            r'문단\s*수',
+            r'글의\s*각\s*단락',
+            r'본문의\s*각\s*문단',
+            r'글의\s*내용\s*단락',
+            r'문단\s*개수',
+            r'문단\s*수는',
+            r'문단\s*개수를',
+            r'문단\s*수를',
+            r'문단\s*개수는',
+            r'문단으로\s*구성',
+            r'문단으로\s*작성',
+            r'문단을\s*작성',
+            r'문단으로\s*맞춰',
+            r'문단으로\s*유지',
+            r'문단으로\s*제한',
+            r'문단은\s*총',
+            r'문단\s*수는\s*총',
+            r'문단\s*개수는\s*총',
+            r'문단은\s*정확히',
+            r'문단\s*수는\s*정확히',
+            r'문단\s*개수는\s*정확히',
+            r'문단을\s*총',
+            r'문단을\s*정확히',
+            r'문단은\s*최소',
+            r'문단은\s*최대',
+            r'문단\s*수는\s*최소',
+            r'문단\s*수는\s*최대',
+            r'문단\s*개수는\s*최소',
+            r'문단\s*개수는\s*최대',
+            r'본문은\s*최소',
+            r'본문은\s*최대'
+        ]
+        is_paragraph_text = any(re.search(pattern, text, re.I) for pattern in paragraph_keywords)
+        
         # 나이/연령 키워드가 있으면 number_between_1_100으로 우선 처리
         age_keywords = [r'\b(?:나이|연령|age)\b']
         is_age_text = any(re.search(pattern, text, re.I) for pattern in age_keywords)
@@ -98,23 +324,28 @@ class Parser:
         if not is_age_text and not is_integer_age and re.search(r'\d+[-/.]\d+[-/.]\d+', text):
             is_datetime_text = True
         
-        field = self.detector.detect_first(text)
-        if not field:
-            if is_datetime_text:
-                field = "datetime"
-            else:
-                return {"type": None, "constraints": {}, "nullablePercent": None}
-
-        # 날짜 관련 텍스트면 datetime 타입으로 강제 (FieldDetector 결과 무시)
-        # 단, 나이/연령 키워드가 있으면 number_between_1_100으로 유지
-        if is_datetime_text and not is_age_text and not is_integer_age:
-            field = "datetime"
-            extractor = self.registry.get("datetime") or self.default_extractor
+        # 문단/단락 관련 텍스트면 paragraphs 타입으로 강제 (최우선)
+        if is_paragraph_text:
+            field = "paragraphs"
+            extractor = self.registry.get("paragraphs") or self.default_extractor
         else:
-            extractor = self.registry.get(field) or self.default_extractor
+            field = self.detector.detect_first(text)
+            if not field:
+                if is_datetime_text:
+                    field = "datetime"
+                else:
+                    return {"type": None, "constraints": {}, "nullablePercent": None}
 
-        # 비밀번호 제약 조건 컨텍스트 후처리
-        if field == "number_between_1_100":
+            # 날짜 관련 텍스트면 datetime 타입으로 강제 (FieldDetector 결과 무시)
+            # 단, 나이/연령 키워드가 있으면 number_between_1_100으로 유지
+            if is_datetime_text and not is_age_text and not is_integer_age:
+                field = "datetime"
+                extractor = self.registry.get("datetime") or self.default_extractor
+            else:
+                extractor = self.registry.get(field) or self.default_extractor
+
+        # 비밀번호 제약 조건 컨텍스트 후처리 (문단 키워드가 없을 때만)
+        if field == "number_between_1_100" and not is_paragraph_text:
             # 더 구체적인 비밀번호 키워드만 사용
             password_specific_keywords = ["비밀번호", "패스워드", "비번", "password", "대문자", "소문자", "특수문자", "특수기호", "symbol", "uppercase", "lowercase"]
             # "숫자는 1에서 100 사이" 같은 경우는 number_between_1_100으로 유지
@@ -126,7 +357,9 @@ class Parser:
                 field = "password"
                 extractor = self.registry.get("password") or self.default_extractor
 
-        extractor = self.registry.get(field) or self.default_extractor
+        # 최종 extractor 설정
+        if not extractor:
+            extractor = self.registry.get(field) or self.default_extractor
 
         # 1) 타입별 constraints - korean_* 타입들을 해당 타입으로 변환
         if field == "korean_phone":
