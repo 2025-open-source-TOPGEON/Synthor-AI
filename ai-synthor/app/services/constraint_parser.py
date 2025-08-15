@@ -56,16 +56,16 @@ class Parser:
         is_integer_age = bool(re.search(integer_age_pattern, text, re.I))
         
         datetime_indicators = [
-            r'\b(?:format|date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
+            r'\b(?:date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
             r'\b(?:e\.?g\.?|example|sample|예시는|샘플|예|샘)[:\s]',
             r'\d{4}[-/.]\d{1,2}[-/.]\d{1,2}',
             r'\d{1,2}[-/.]\d{1,2}[-/.]\d{4}',
             r'\d{2}[-/.]\d{1,2}[-/.]\d{1,2}',
-            # 나이/연령 컨텍스트가 아닐 때만 from/to/between을 날짜로 인식
-            r'(?<!나이|연령)\b(?:from|to|through|between|range|기간|조회기간|시작일|종료일|start|end)\b(?!\s*\d+)',
-            r'\b(?:use|포맷|형식|fmt)\b',  # nullable 제거
+            # 나이/연령 컨텍스트가 아닐 때만 from/between을 날짜로 인식 (to는 이메일에서도 사용되므로 제외)
+            r'(?<!나이|연령)\b(?:from|through|between|range|기간|조회기간|시작일|종료일|start|end)\b(?!\s*\d+)',
+            r'\b(?:fmt)\b',  # use 제거 (이메일에서도 사용됨)
             r'\b(?:d/m/yyyy|m/d/yyyy|mm/dd/yyyy|yyyy-mm-dd|yyyy-mm)\b',
-            r'\b(?:please|only|같은|형식|포맷만|설정)\b',
+            r'\b(?:같은|설정)\b',  # only 제거 (이메일에서도 사용됨)
         ]
         
         is_datetime_text = any(re.search(pattern, text, re.I) for pattern in datetime_indicators)
@@ -105,8 +105,14 @@ class Parser:
 
         # 비밀번호 제약 조건 컨텍스트 후처리
         if field == "number_between_1_100":
-            password_constraint_keywords = ["대문자", "소문자", "숫자", "특수문자", "특수기호", "symbol", "uppercase", "lowercase", "numbers", "letters", "character", "characters", "비밀번호", "password"]
-            if any(keyword in text for keyword in password_constraint_keywords):
+            # 더 구체적인 비밀번호 키워드만 사용
+            password_specific_keywords = ["비밀번호", "패스워드", "비번", "password", "대문자", "소문자", "특수문자", "특수기호", "symbol", "uppercase", "lowercase"]
+            # "숫자는 1에서 100 사이" 같은 경우는 number_between_1_100으로 유지
+            if re.search(r'숫자.*\d+.*\d+', text) and not any(keyword in text for keyword in ["비밀번호", "패스워드", "password"]):
+                field = "number_between_1_100"
+                extractor = self.registry.get("number_between_1_100") or self.default_extractor
+            # 숫자 키워드는 비밀번호 컨텍스트에서만 사용
+            elif any(keyword in text for keyword in password_specific_keywords) or ("숫자" in text and ("비밀번호" in text or "패스워드" in text or "password" in text)):
                 field = "password"
                 extractor = self.registry.get("password") or self.default_extractor
 
@@ -151,6 +157,13 @@ class Parser:
         except ValueError as e:
             return {"type": None, "constraints": {}, "nullablePercent": None}
 
+        # datetime 필드명 매핑 (from/to 유지)
+        # if field == "datetime" and constraints:
+        #     if "from" in constraints:
+        #         constraints["min_date"] = constraints.pop("from")
+        #     if "to" in constraints:
+        #         constraints["max_date"] = constraints.pop("to")
+
         # 2) 전역 보조 제약 merge (password/phone 등 제한 타입일 때만 반영하려면 여기서 merge)
         global_c = self.qualifiers.extract(text)
         constraints.update(global_c)
@@ -160,16 +173,9 @@ class Parser:
 
                     # 4) 최종 JSON 조립 (원 코드와 완전 동일 포맷)
         if field in CONSTRAINT_TYPES:
-            # number_between_1_100과 korean_* 타입들은 원래 이름 그대로 사용
-            if field == "number_between_1_100" or field.startswith("korean_"):
-                type_name = field
-            else:
-                # email_address, password, datetime은 그대로 유지, 나머지는 대문자로 시작하도록 변환
-                if field == "email_address" or field == "password" or field == "datetime":
-                    type_name = field
-                else:
-                    type_name = field.replace("_", " ").title().replace(" ", "")
+            # 모든 타입을 소문자로 반환
+            type_name = field
             return {"type": type_name, "constraints": constraints, "nullablePercent": nullable}
         else:
-            type_name = field.replace("_", " ").title().replace(" ", "")
+            type_name = field
             return {"type": type_name, "constraints": {}, "nullablePercent": nullable}

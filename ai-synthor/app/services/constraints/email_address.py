@@ -345,14 +345,27 @@ class EmailAddressConstraint:
             constraints["domain"] = domain
             return constraints
                 
-        # 5. 여러 도메인 제약 조건 파싱 (예: "네이버나 구글 이메일")
+        # 5. 여러 도메인 제약 조건 파싱 (예: "네이버나 구글 이메일", "naver.com 또는 daum.net")
         domains = []
+        
+        # 한국어 도메인 매핑에서 찾기
         for kor_domain, eng_domain in self.korean_domain_mapping.items():
             if kor_domain in text:
                 domains.append(eng_domain)
+        
+        # 영어 도메인 패턴에서 찾기 (예: "naver.com 또는 daum.net")
+        english_domain_patterns = [
+            r'([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\s*(?:또는|or)\s*([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})',
+            r'([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\s*,\s*([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})',
+        ]
+        
+        for pattern in english_domain_patterns:
+            match = re.search(pattern, text)
+            if match:
+                domains.extend(match.groups())
                 
         if len(domains) > 1:
-            constraints["domains"] = domains
+            constraints["domain"] = domains
             return constraints
             
         return None if not constraints else constraints
