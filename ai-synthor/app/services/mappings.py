@@ -88,6 +88,7 @@ KOR_TO_ENG_FIELD = {
     # 공통
     "사용자명": "username", "유저명": "username", "계정명": "username", "계정 이름": "username", "유저 이름": "username",
     "비밀번호": "password", "패스워드": "password", "비번": "password",
+    "특수문자": "password", "특수 문자": "password", "특수기호": "password", "특수 기호": "password",
     "이메일": "email_address", "이메일 주소": "email_address", "메일": "email_address", "메일 주소": "email_address",
     "네이버 도메인 이메일": "email_address", "네이버 도메인 메일": "email_address", "네이버 도메인 mail": "email_address",
     "구글 도메인 이메일": "email_address", "구글 도메인 메일": "email_address", "구글 도메인 mail": "email_address",
