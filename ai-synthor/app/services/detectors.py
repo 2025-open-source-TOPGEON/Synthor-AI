@@ -8,11 +8,26 @@ class FieldDetector:
 
         # 비밀번호 관련 키워드 우선 확인 (높은 우선순위)
         password_keywords = ["비밀번호", "패스워드", "비번", "password"]
-        password_constraint_keywords = ["대문자", "소문자", "숫자", "특수문자", "특수기호", "symbol", "uppercase", "lowercase", "numbers", "letters", "character", "characters"]
+        password_constraint_keywords = [
+            "대문자", "소문자", "특수문자", "특수기호", "symbol", "uppercase", "lowercase", "numbers", "letters",
+            "포함되어야", "포함", "include", "special characters", "특수 문자", "문자", "characters"
+        ]
+        # 숫자 키워드는 비밀번호 컨텍스트에서만 사용
         has_password_context = any(keyword in text for keyword in password_keywords) or any(keyword in text for keyword in password_constraint_keywords)
+        # "숫자는 1에서 100 사이" 같은 경우는 제외
+        if "숫자" in text and not any(keyword in text for keyword in password_keywords):
+            has_password_context = False
 
         # 비밀번호 제약 조건 키워드가 있으면 우선적으로 password 반환
         if has_password_context:
+            return "password"
+        
+        # 추가: "숫자가 포함되어야" 같은 패턴은 password로 분류
+        if "숫자" in text and ("포함되어야" in text or "포함" in text):
+            return "password"
+        
+        # 추가: "minimum length" + "include" 같은 패턴은 password로 분류
+        if ("minimum" in text.lower() or "length" in text.lower()) and ("include" in text.lower() or "special" in text.lower()):
             return "password"
 
         # 한글 키워드
