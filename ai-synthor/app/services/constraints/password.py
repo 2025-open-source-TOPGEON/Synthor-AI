@@ -105,6 +105,8 @@ class PasswordExtractor(ConstraintExtractor):
             r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*uppercase(?:\s*letters?)?|'
             r'capitals?[:\s]*:?[\s]*(\d+)|'                         # capital: 2
             r'at\s*least\s*(\d+)\s*capitals?|'                      # at least 1 capital
+            r'(?:with|포함)\s*(?:uppercase|대문자)|'                 # with uppercase
+            r'(?:uppercase|대문자)(?:\s*and\s*(?:lowercase|소문자|numbers?|숫자|symbols?|특수문자))?|'  # uppercase (with and)
             r'(대문자.*?포함.*?(?:되어야|해야)|포함.*?대문자)|'        # 대문자 포함되어야 해
             r'(?:대문자|uppercase).*?포함.*?(?:되어야|해야|필수)|'    # 대문자 포함되어야 해
             r'포함.*?(?:대문자|uppercase).*?(?:되어야|해야|필수)|'    # 포함 대문자 되어야 해
@@ -134,6 +136,8 @@ class PasswordExtractor(ConstraintExtractor):
             r'lower(?:case)?[:\s]*:?[\s]*(\d+)|'
             r'lowercase\s*>=\s*(\d+)|'
             r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*lowercase(?:\s*letters?)?|'
+            r'(?:with|포함)\s*(?:lowercase|소문자)|'                   # with lowercase
+            r'(?:lowercase|소문자)(?:\s*and\s*(?:uppercase|대문자|numbers?|숫자|symbols?|특수문자))?|'  # lowercase (with and)
             r'(소문자.*?포함.*?(?:되어야|해야)|포함.*?소문자)|'
             r'(?:소문자|lowercase).*?포함.*?(?:되어야|해야|필수)|'    # 소문자 포함되어야 해
             r'포함.*?(?:소문자|lowercase).*?(?:되어야|해야|필수)|'    # 포함 소문자 되어야 해
@@ -162,6 +166,8 @@ class PasswordExtractor(ConstraintExtractor):
             r'digits?[:\s]*:?[\s]*(\d+)|'
             r'numerals?[:\s]*:?[\s]*(\d+)|'                         #numeral: 2
             r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*(?:digits?|numbers?|numerals?)|'
+            r'(?:with|포함)\s*(?:numbers?|숫자)|'                     # with numbers
+            r'(?:numbers?|숫자)(?:\s*and\s*(?:uppercase|대문자|lowercase|소문자|symbols?|특수문자))?|'  # numbers (with and)
             r'(숫자.*?포함.*?(?:되어야|해야)|포함.*?숫자)|'              # 숫자 포함되어야 해
             r'(?:숫자|number).*?포함.*?(?:되어야|해야|필수)|'          # 숫자 포함되어야 해
             r'포함.*?(?:숫자|number).*?(?:되어야|해야|필수)|'          # 포함 숫자 되어야 해
@@ -189,6 +195,8 @@ class PasswordExtractor(ConstraintExtractor):
             r'punctuation[:\s]*:?[\s]*(\d+)|'
             r'non[- ]?alphanumeric[:\s]*:?[\s]*(\d+)|'
             r'(?:at\s*least|no\s*less\s*than)\s*(\d+)\s*(?:symbols?|punctuation|special\s*(?:chars?|characters?))|'
+            r'(?:with|포함)\s*(?:symbols?|특수문자|특문|기호)|'       # with symbols
+            r'(?:symbols?|특수문자|특문|기호)(?:\s*and\s*(?:uppercase|대문자|lowercase|소문자|numbers?|숫자))?|'  # symbols (with and)
             r'((?:특수.*?문자|특문|기호).*?포함.*?(?:되어야|해야)|포함.*?(?:특수.*?문자|특문|기호))|'  # 특수 문자 포함되어야 해
             r'(?:특수.*?문자|특문|기호|special\s*char|symbol).*?포함.*?(?:되어야|해야|필수)|'  # 특수문자 포함되어야 해
             r'포함.*?(?:특수.*?문자|특문|기호|special\s*char|symbol).*?(?:되어야|해야|필수)|'  # 포함 특수문자 되어야 해

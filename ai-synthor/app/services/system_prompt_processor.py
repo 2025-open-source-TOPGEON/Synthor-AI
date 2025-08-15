@@ -124,7 +124,7 @@ class SystemPromptProcessor:
         # 1. 언어 감지
         language = detect_supported_language(prompt)
         
-        # 2. 자연어 필드명과 제약 조건 파싱 시도
+        # 2. 자연어 필드명과 제약 조건 파싱 시도 (한국어 + 영어 모두)
         parsed_fields = self._parse_natural_language_fields(prompt)
         if parsed_fields:
             return {
@@ -150,19 +150,32 @@ class SystemPromptProcessor:
         """자연어로 된 필드 요청을 파싱합니다."""
         fields = []
         
-        # 필드명 추출 패턴
+        # 필드명 추출 패턴 (한국어 + 영어)
         field_keywords = [
-            "프로필 이미지", "아바타", "avatar", "profile image",
+            # 프로필/아바타
+            "프로필 이미지", "아바타", "avatar", "profile image", "profile picture", "profile photo",
+            # 나이/연령
             "나이", "age", "연령",
-            "이름", "name", "성명",
-            "이메일", "email", "이메일주소",
+            # 이름
+            "이름", "name", "성명", "full name", "first name", "last name",
+            # 이메일
+            "이메일", "email", "이메일주소", "email address",
+            # 비밀번호
             "비밀번호", "password", "패스워드",
-            "전화번호", "phone", "휴대폰",
-            "주소", "address",
-            "생년월일", "birth date", "생일",
-            "사용자명", "username", "아이디",
-            "회사명", "company name",
-            "직책", "job title", "직위"
+            # 전화번호
+            "전화번호", "phone", "휴대폰", "phone number", "telephone",
+            # 주소
+            "주소", "address", "street address",
+            # 생년월일
+            "생년월일", "birth date", "생일", "date of birth", "birthday",
+            # 사용자명
+            "사용자명", "username", "아이디", "user name", "login id",
+            # 회사
+            "회사명", "company name", "company", "organization",
+            # 직책
+            "직책", "job title", "직위", "position", "title",
+            # 기타
+            "city", "state", "country", "postal code", "zip code"
         ]
         
         found_fields = []
@@ -194,11 +207,14 @@ class SystemPromptProcessor:
             # 필드명 생성 (영어로)
             generated_name = self._generate_english_field_name(field_name, field_type)
             
+            # nullable_percent를 constraints에서 제거하고 별도 필드로 설정
+            nullable_percent = field_constraints.pop("nullable_percent", 0) if "nullable_percent" in field_constraints else 0
+            
             fields.append({
                 "name": generated_name,
                 "type": self.field_type_mapping.get(field_type, field_type.title()),
                 "constraints": field_constraints,
-                "nullablePercent": field_constraints.get("nullable_percent", 0) if "nullable_percent" in field_constraints else 0
+                "nullablePercent": nullable_percent
             })
         
         return fields
@@ -318,8 +334,12 @@ class SystemPromptProcessor:
         """필드명과 제약 조건을 기반으로 타입을 추론합니다."""
         field_name_lower = field_name.lower()
         
-        # 필드명 기반 추론
-        if any(keyword in field_name_lower for keyword in ["이름", "name"]):
+        # 필드명 기반 추론 (더 구체적인 매칭부터)
+        if any(keyword in field_name_lower for keyword in ["프로필 이미지", "profile image", "profile picture", "profile photo", "아바타", "avatar"]):
+            return "avatar"
+        elif any(keyword in field_name_lower for keyword in ["나이", "age"]):
+            return "number_between_1_100"
+        elif any(keyword in field_name_lower for keyword in ["이름", "name"]):
             return "full_name"
         elif any(keyword in field_name_lower for keyword in ["이메일", "email"]):
             return "email_address"
@@ -331,10 +351,6 @@ class SystemPromptProcessor:
             return "address"
         elif any(keyword in field_name_lower for keyword in ["생년월일", "생일", "birth"]):
             return "datetime"
-        elif any(keyword in field_name_lower for keyword in ["나이", "age"]):
-            return "number_between_1_100"
-        elif any(keyword in field_name_lower for keyword in ["프로필", "아바타", "avatar", "image"]):
-            return "avatar"
         
         # 제약 조건 기반 추론
         if "소수점" in constraints_text or "decimal" in constraints_text.lower():

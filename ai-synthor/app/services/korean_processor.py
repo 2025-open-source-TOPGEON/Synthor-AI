@@ -899,7 +899,7 @@ def parse_korean_text_to_json(text: str) -> dict:
                 }
                 # constraints가 None이면 빈 객체로 설정
                 field_obj["constraints"] = constraints if constraints is not None else {}
-                # nullablePercent 설정 (기본값 0)
+                # nullablePercent는 별도 필드로만 설정
                 field_obj["nullablePercent"] = nullable_percent
                 fields.append(field_obj)
 
