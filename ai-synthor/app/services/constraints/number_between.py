@@ -148,7 +148,18 @@ class NumberBetweenExtractor(ConstraintExtractor):
                 lo, hi = (a, b) if a <= b else (b, a)
                 c["min"], c["max"] = lo, hi
 
-        # --- 5) and/or 분해 개별 규칙 ---
+        # --- 5) 명시적 min/max 패턴 (최우선) ---
+        if "min" not in c:
+            m_min_explicit = re.search(r'min\s+(\d+)', text, re.I)
+            if m_min_explicit:
+                c["min"] = self._to_number(m_min_explicit.group(1))
+        
+        if "max" not in c:
+            m_max_explicit = re.search(r'max\s+(\d+)', text, re.I)
+            if m_max_explicit:
+                c["max"] = self._to_number(m_max_explicit.group(1))
+
+        # --- 6) and/or 분해 개별 규칙 ---
         if ("min" not in c or "max" not in c) and not exclusive_lock:
             parts = re.split(r'\s+and\s+|\s+or\s+', text, flags=re.I)
 
@@ -244,28 +255,40 @@ class NumberBetweenExtractor(ConstraintExtractor):
                 c["min"] = self._to_number(m_min_alt.group(1))
 
         # --- 8) 기본값 (스펙상 1~100) ---
-        if "min" not in c:
+        # 명시적으로 min, max가 지정되지 않은 경우에만 기본값 적용
+        # 입력에서 min, max가 명시적으로 지정된 경우 기본값을 덮어쓰지 않음
+        if "min" not in c and not re.search(r'min\s+\d+', text, re.I):
             c["min"] = 1
-        if "max" not in c:
+        if "max" not in c and not re.search(r'max\s+\d+', text, re.I):
             c["max"] = 100
 
         # --- 9) 정리/클램프 ---
-        if c["min"] > c["max"]:
+        if "min" in c and "max" in c and c["min"] > c["max"]:
             c["min"], c["max"] = c["max"], c["min"]
 
         # Remove hard clamping to allow values outside 1-100 range
-        c["min"] = float(c["min"])
-        c["max"] = float(c["max"])
+        if "min" in c:
+            c["min"] = float(c["min"])
+        if "max" in c:
+            c["max"] = float(c["max"])
 
         if c["decimals"] == 0:
             def _maybe_int(x):
                 xf = float(x)
                 return int(xf) if xf.is_integer() else xf
-            c["min"] = _maybe_int(c["min"])
-            c["max"] = _maybe_int(c["max"])
+            if "min" in c:
+                c["min"] = _maybe_int(c["min"])
+            if "max" in c:
+                c["max"] = _maybe_int(c["max"])
 
-        # ✅ constraints만 반환
-        return {"min": c["min"], "max": c["max"], "decimals": int(c["decimals"])}
+        # ✅ constraints만 반환 (순서: min, max, decimals)
+        result = {}
+        if "min" in c:
+            result["min"] = c["min"]
+        if "max" in c:
+            result["max"] = c["max"]
+        result["decimals"] = int(c["decimals"])
+        return result
 
     # ---------- 최종 형식이 바로 필요하면 ----------
     def extract_full(self, text: str) -> dict:

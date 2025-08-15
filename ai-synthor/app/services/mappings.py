@@ -296,6 +296,7 @@ KOR_TO_ENG_VALUE = {
 }
 
 EN_TO_TYPE_FIELD = {
+    "korean_full_name": "korean_full_name",
     "full name": "full_name", "fullname": "full_name", "name": "full_name",
     "first name": "first_name", "given name": "first_name",
     "last name": "last_name", "surname": "last_name", "family name": "last_name",

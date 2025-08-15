@@ -33,6 +33,7 @@ class KoreanFullNameExtractor(ConstraintExtractor):
         eng_patterns = [
             r'(?:last\s*name|family\s*name|surname)\s*[:=]\s*(' + self._H15 + r')(?=\s|$)',
             r'full\s*name\s*(?:starts|begins)\s*with\s*(' + self._H15 + r')(?=\s|$)',
+            r'lastName\s+(' + self._H15 + r')(?=\s|$)',
         ]
         for p in eng_patterns:
             m = re.search(p, t, flags=re.IGNORECASE)

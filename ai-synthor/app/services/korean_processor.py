@@ -630,12 +630,26 @@ def parse_korean_text_to_json(text: str) -> dict:
                     field_type = "string"
                 else:
                     field_type = "string"
-                field_obj = {"type": eng}
-                if constraints is not None:
-                    field_obj["constraints"] = constraints
-                # nullable 설정 추가
-                if nullable_percent > 0:
-                    field_obj["nullablePercent"] = nullable_percent
+                
+                # name 필드를 적절한 필드명으로 설정
+                field_name = eng
+                if eng == "korean_full_name":
+                    field_name = "full_name"
+                elif eng == "email_address":
+                    field_name = "email"
+                elif eng == "number_between_1_100":
+                    field_name = "age"
+                elif eng == "avatar":
+                    field_name = "profile_image"
+                
+                field_obj = {
+                    "name": field_name,
+                    "type": eng
+                }
+                # constraints가 None이면 빈 객체로 설정
+                field_obj["constraints"] = constraints if constraints is not None else {}
+                # nullablePercent 설정 (기본값 0)
+                field_obj["nullablePercent"] = nullable_percent
                 fields.append(field_obj)
 
     # 2. 영문 타입명 직접 매칭
@@ -867,12 +881,26 @@ def parse_korean_text_to_json(text: str) -> dict:
                     field_type = "string"
                 else:
                     field_type = "string"
-                field_obj = {"type": eng}
-                if constraints is not None:
-                    field_obj["constraints"] = constraints
-                # nullable 설정 추가
-                if nullable_percent > 0:
-                    field_obj["nullablePercent"] = nullable_percent
+                
+                # name 필드를 적절한 필드명으로 설정
+                field_name = eng
+                if eng == "korean_full_name":
+                    field_name = "full_name"
+                elif eng == "email_address":
+                    field_name = "email"
+                elif eng == "number_between_1_100":
+                    field_name = "age"
+                elif eng == "avatar":
+                    field_name = "profile_image"
+                
+                field_obj = {
+                    "name": field_name,
+                    "type": eng
+                }
+                # constraints가 None이면 빈 객체로 설정
+                field_obj["constraints"] = constraints if constraints is not None else {}
+                # nullablePercent 설정 (기본값 0)
+                field_obj["nullablePercent"] = nullable_percent
                 fields.append(field_obj)
 
     if unsupported_fields:
