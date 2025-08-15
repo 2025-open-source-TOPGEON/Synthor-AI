@@ -32,6 +32,9 @@ class NullablePercentExtractor:
             # "이" 조사 패턴 추가
             re.search(r'(nullable|null|빈값|결측|결측치|없어도|옵션|optional|missing)이\s*(\d{1,3})', text, re.I),
             re.search(r'(\d{1,3})\s*이면', text, re.I),
+            # "은" 조사 패턴 추가
+            re.search(r'(nullable|null|빈값|결측|결측치|없어도|옵션|optional|missing)은\s*(\d{1,3})', text, re.I),
+            re.search(r'(\d{1,3})\s*은\s*(nullable|null|빈값|결측|결측치|없어도|옵션|optional|missing)', text, re.I),
         ]
         for m in checks:
             if m:

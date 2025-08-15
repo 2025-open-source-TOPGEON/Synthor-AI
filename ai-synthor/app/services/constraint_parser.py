@@ -36,16 +36,67 @@ class Parser:
             PasswordExtractor(), PhoneExtractor(), AvatarExtractor(),
             StateExtractor(), CountryExtractor(), DatetimeExtractor(),
             TimeExtractor(), UrlExtractor(), CreditCardNumberExtractor(),
-            CreditCardTypeExtractor(), ParagraphsExtractor(), NumberBetweenExtractor(),
-            KoreanFullNameExtractor(), KoreanLastNameExtractor(), EmailExtractor()
+            CreditCardTypeExtractor(), ParagraphsExtractor(), 
+            KoreanFullNameExtractor(), KoreanLastNameExtractor(), EmailExtractor(),
+            NumberBetweenExtractor()  # 숫자범위는 마지막에 배치
         ]:
             reg.register(ext)
         return reg
 
     def parse_field_constraint(self, text: str) -> Dict:
+        # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
+        import re
+        datetime_indicators = [
+            r'\b(?:format|date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
+            r'\b(?:e\.?g\.?|example|sample|예시는|샘플|예|샘)[:\s]',
+            r'\d{4}[-/.]\d{1,2}[-/.]\d{1,2}',
+            r'\d{1,2}[-/.]\d{1,2}[-/.]\d{4}',
+            r'\d{2}[-/.]\d{1,2}[-/.]\d{1,2}',
+            r'\b(?:from|to|through|between|range|기간|조회기간|시작일|종료일|start|end)\b',
+            r'\b(?:nullable|빈값|결측|누락|use|포맷|형식|fmt)\b',
+            r'\b(?:d/m/yyyy|m/d/yyyy|mm/dd/yyyy|yyyy-mm-dd|yyyy-mm)\b',
+            r'\b(?:please|only|같은|형식|포맷만|설정)\b',
+        ]
+        
+        is_datetime_text = any(re.search(pattern, text, re.I) for pattern in datetime_indicators)
+        
+        # 추가 날짜 감지: 날짜 패턴이 있으면 무조건 datetime
+        date_patterns = [
+            r'\d{4}[-/.]\d{1,2}[-/.]\d{1,2}',  # 2023-07-09, 2023/07/09
+            r'\d{1,2}[-/.]\d{1,2}[-/.]\d{4}',  # 25/12/2023, 12/25/2023
+            r'\d{2}[-/.]\d{1,2}[-/.]\d{1,2}',  # 23/12/25
+            r'\d{4}[-/.]\d{1,2}',  # 2023-01, 2023.1
+        ]
+        has_date_pattern = any(re.search(pattern, text) for pattern in date_patterns)
+        
+        # 날짜 패턴이 있으면 무조건 datetime으로 설정
+        if has_date_pattern:
+            is_datetime_text = True
+        
+        # 더 강력한 날짜 감지: 숫자-숫자-숫자 패턴이 있으면 무조건 datetime
+        if re.search(r'\d+[-/.]\d+[-/.]\d+', text):
+            is_datetime_text = True
+        
         field = self.detector.detect_first(text)
         if not field:
-            return {"type": None, "constraints": {}, "nullablePercent": None}
+            if is_datetime_text:
+                field = "datetime"
+            else:
+                return {"type": None, "constraints": {}, "nullablePercent": None}
+
+        # 날짜 관련 텍스트면 datetime 타입으로 강제 (FieldDetector 결과 무시)
+        if is_datetime_text:
+            field = "datetime"
+            extractor = self.registry.get("datetime") or self.default_extractor
+        else:
+            extractor = self.registry.get(field) or self.default_extractor
+
+        # 비밀번호 제약 조건 컨텍스트 후처리
+        if field == "number_between_1_100":
+            password_constraint_keywords = ["대문자", "소문자", "숫자", "특수문자", "특수기호", "symbol", "uppercase", "lowercase", "numbers", "letters", "character", "characters", "비밀번호", "password"]
+            if any(keyword in text for keyword in password_constraint_keywords):
+                field = "password"
+                extractor = self.registry.get("password") or self.default_extractor
 
         extractor = self.registry.get(field) or self.default_extractor
 
@@ -95,14 +146,14 @@ class Parser:
         # 3) nullablePercent
         nullable = self.nullables.extract(text)
 
-        # 4) 최종 JSON 조립 (원 코드와 완전 동일 포맷)
+                    # 4) 최종 JSON 조립 (원 코드와 완전 동일 포맷)
         if field in CONSTRAINT_TYPES:
             # number_between_1_100과 korean_* 타입들은 원래 이름 그대로 사용
             if field == "number_between_1_100" or field.startswith("korean_"):
                 type_name = field
             else:
-                # email_address는 그대로 유지, 나머지는 대문자로 시작하도록 변환
-                if field == "email_address":
+                # email_address, password, datetime은 그대로 유지, 나머지는 대문자로 시작하도록 변환
+                if field == "email_address" or field == "password" or field == "datetime":
                     type_name = field
                 else:
                     type_name = field.replace("_", " ").title().replace(" ", "")

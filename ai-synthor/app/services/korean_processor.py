@@ -1,4 +1,5 @@
 import re
+from .nullables import NullablePercentExtractor
 
 # 지원하는 데이터 타입(필드명) 목록 (한국어 전용, 영문, 언어 중립)
 SUPPORTED_TYPES = {
@@ -74,10 +75,6 @@ KOR_TO_ENG_FIELD = {
     # korean_last_name
     "성": "korean_last_name",
     "성씨": "korean_last_name",
-    "이씨": "korean_last_name",
-    "김씨": "korean_last_name",
-    "박씨": "korean_last_name",
-    "최씨": "korean_last_name",
     "이 성": "korean_last_name",
     "김 성": "korean_last_name",
     "박 성": "korean_last_name",
@@ -86,6 +83,11 @@ KOR_TO_ENG_FIELD = {
     "성(김)": "korean_last_name",
     "성(박)": "korean_last_name",
     "성(최)": "korean_last_name",
+    # korean_full_name에 성씨 패턴 추가
+    "이씨": "korean_full_name",
+    "김씨": "korean_full_name",
+    "박씨": "korean_full_name",
+    "최씨": "korean_full_name",
     # korean_first_name
     "이름(이)": "korean_first_name",
     "이름(김)": "korean_first_name",
@@ -321,6 +323,10 @@ def parse_korean_text_to_json(text: str) -> dict:
     else:
         count = 1
 
+    # nullable 설정 파싱
+    nullable_extractor = NullablePercentExtractor()
+    nullable_percent = nullable_extractor.extract(text)
+
     fields = []
     unsupported_fields = []
     used_fields = set()
@@ -355,27 +361,45 @@ def parse_korean_text_to_json(text: str) -> dict:
                         constraints = cdict
                 # password
                 elif eng == "password":
+                    # 최소 길이 패턴 (숫자 명시형)
                     minlen = re.search(r'(\d+)자 이상|minimum length:?\s*(\d+)', text, re.IGNORECASE)
+                    
+                    # 포함 패턴 (숫자 미명시형 - 기본값 1)
+                    upper_include = re.search(r'대문자.*?(포함|되야해|되어야해|있어야\s*해)|(포함|되야해|되어야해|있어야\s*해).*?대문자', text, re.IGNORECASE)
+                    lower_include = re.search(r'소문자.*?(포함|되야해|되어야해|있어야\s*해)|(포함|되야해|되어야해|있어야\s*해).*?소문자', text, re.IGNORECASE)
+                    numbers_include = re.search(r'숫자.*?(포함|되야해|되어야해|있어야\s*해)|(포함|되야해|되어야해|있어야\s*해).*?숫자', text, re.IGNORECASE)
+                    symbols_include = re.search(r'기호.*?(포함|되야해|되어야해|있어야\s*해)|특수문자.*?(포함|되야해|되어야해|있어야\s*해)', text, re.IGNORECASE)
+                    
+                    # 숫자 명시형 패턴
                     upper = re.search(r'대문자\s*(\d+)개|upper:?\s*(\d+)', text, re.IGNORECASE)
                     lower = re.search(r'소문자\s*(\d+)개|lower:?\s*(\d+)', text, re.IGNORECASE)
                     numbers = re.search(r'숫자\s*(\d+)개|numbers?:?\s*(\d+)', text, re.IGNORECASE)
-                    symbols = re.search(r'특수문자\s*(\d+)개|symbols?:?\s*(\d+)', text, re.IGNORECASE)
+                    symbols = re.search(r'특수문자\s*(\d+)개|기호\s*(\d+)개|symbols?:?\s*(\d+)', text, re.IGNORECASE)
+                    
                     cdict = {}
                     if minlen:
                         minlen_val = next(filter(None, minlen.groups()))
-                        cdict["min_length"] = int(minlen_val)
+                        cdict["minimum_length"] = int(minlen_val)
                     if upper:
                         upper_val = next(filter(None, upper.groups()))
                         cdict["upper"] = int(upper_val)
+                    elif upper_include:
+                        cdict["upper"] = 1
                     if lower:
                         lower_val = next(filter(None, lower.groups()))
                         cdict["lower"] = int(lower_val)
+                    elif lower_include:
+                        cdict["lower"] = 1
                     if numbers:
                         numbers_val = next(filter(None, numbers.groups()))
                         cdict["numbers"] = int(numbers_val)
+                    elif numbers_include:
+                        cdict["numbers"] = 1
                     if symbols:
                         symbols_val = next(filter(None, symbols.groups()))
                         cdict["symbols"] = int(symbols_val)
+                    elif symbols_include:
+                        cdict["symbols"] = 1
                     if cdict:
                         constraints = cdict
                 # phone
@@ -564,6 +588,15 @@ def parse_korean_text_to_json(text: str) -> dict:
                     
                     if cdict:
                         constraints = cdict
+                # korean_full_name
+                elif eng == "korean_full_name":
+                    # 성씨 제약 조건 파싱 (예: "김씨인 사람만", "이씨만", "박씨")
+                    # 성씨 제약 조건 파싱 - 더 간단하고 명확한 접근
+                    # 모든 "~씨" 패턴을 찾아서 성씨만 추출
+                    lastname_match = re.search(r'([가-힣]+)씨', text)
+                    if lastname_match:
+                        lastname = lastname_match.group(1)
+                        constraints = {"lastName": lastname}
             # 나머지 타입은 constraints 없이 제공
             if eng not in SUPPORTED_TYPES:
                 unsupported_fields.append(eng)
@@ -577,6 +610,9 @@ def parse_korean_text_to_json(text: str) -> dict:
                 field_obj = {"type": eng}
                 if constraints is not None:
                     field_obj["constraints"] = constraints
+                # nullable 설정 추가
+                if nullable_percent > 0:
+                    field_obj["nullablePercent"] = nullable_percent
                 fields.append(field_obj)
 
     # 2. 영문 타입명 직접 매칭
@@ -790,6 +826,15 @@ def parse_korean_text_to_json(text: str) -> dict:
                     
                     if cdict:
                         constraints = cdict
+                # korean_full_name
+                elif eng == "korean_full_name":
+                    # 성씨 제약 조건 파싱 (예: "김씨인 사람만", "이씨만", "박씨")
+                    # 성씨 제약 조건 파싱 - 더 간단하고 명확한 접근
+                    # 모든 "~씨" 패턴을 찾아서 성씨만 추출
+                    lastname_match = re.search(r'([가-힣]+)씨', text)
+                    if lastname_match:
+                        lastname = lastname_match.group(1)
+                        constraints = {"lastName": lastname}
             if eng not in SUPPORTED_TYPES:
                 unsupported_fields.append(eng)
             else:
@@ -802,6 +847,9 @@ def parse_korean_text_to_json(text: str) -> dict:
                 field_obj = {"type": eng}
                 if constraints is not None:
                     field_obj["constraints"] = constraints
+                # nullable 설정 추가
+                if nullable_percent > 0:
+                    field_obj["nullablePercent"] = nullable_percent
                 fields.append(field_obj)
 
     if unsupported_fields:

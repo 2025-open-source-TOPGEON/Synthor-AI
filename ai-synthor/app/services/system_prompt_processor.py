@@ -16,7 +16,7 @@ class SystemPromptProcessor:
             "full_name": "Full Name",
             "email_address": "Email Address", 
             "password": "Password",
-            "datetime": "Datetime",
+            "datetime": "datetime",
             "phone": "Phone Number",
             "address": "Address",
             "city": "City",
@@ -135,7 +135,7 @@ class SystemPromptProcessor:
         # 개인정보 관련 키워드
         if any(keyword in prompt_lower for keyword in ["개인정보", "personal", "정보", "information"]):
             if not any(field["name"] == "birth_date" for field in default_fields):
-                default_fields.append({"name": "birth_date", "type": "Datetime", "constraints": {"format": "yyyy-mm-dd"}, "nullablePercent": 10})
+                default_fields.append({"name": "birth_date", "type": "datetime", "constraints": {"format": "yyyy-mm-dd"}, "nullablePercent": 10})
         
         # 기본 필드가 없으면 최소한의 필드 제공
         if not default_fields:

@@ -1,437 +1,265 @@
 from .constraint_parser import Parser
 
 test_cases = [
+    # Date range patterns
+    "2023-01-05 ~ 2023-12-32 사이",
+    "2023.1.5 ~ 2023.12.31 범위",
+    "2023/1/5 ~ 2023/12/31 between",
+    "from 2023-01-05 to 2023-12-31",
+    "since 2023.1.5 until 2023.12.31",
+    "start date: 2023-01-05",
+    "end date: 2023-12-31",
+    "시작일: 2023-01-05",
+    "종료일: 2023-12-31",
+    "2023-01-05부터 2023-12-31까지",
+    "between 2023-01-05 and 2023-12-31",
+    "기간: 2023-01-05 ~ 2023-12-31",
+    "range: 2023-01-05 to 2023-12-31",
     
-    # 1. naver.com
-    "naver.com으로요.",
-    "네이버 메일로요.",
-    "네이버 계정 이메일로요.",
-    "네이버 메일 주소로요.",
-    "네이버 이메일로요.",
-    "네이버 도메인 이메일로요.",
-    "네이버 계정 쓰고 계신 이메일로요.",
-    "네이버 계정 메일로요.",
-    "네이버 아이디 이메일로요.",
-    "네이버 도메인 메일로요.",
+    # Format specifications - m/d/yyyy
+    "m/d/yyyy 형식으로",
+    "m/d/yyyy 포맷 사용",
+    "m/d/yyyy 방식으로 부탁",
+    "format: m/d/yyyy",
+    "date format: m/d/yyyy",
+    "use m/d/yyyy",
+    "please use m/d/yyyy",
+    "set to m/d/yyyy",
+    "prefer m/d/yyyy",
+    "default m/d/yyyy",
+    "mdy",
     
-    # 영어
-    "To naver.com, please.",
-    "With your Naver email, please.",
-    "Using your Naver account email, please.",
-    "To your Naver mail address, please.",
-    "Using your Naver email address, please.",
-    "With your Naver domain email, please.",
-    "To the email you use for your Naver account, please.",
-    "Using your Naver account mail, please.",
-    "With your Naver ID email, please.",
-    "Using your Naver domain mail, please.",
+    # Format specifications - mm/dd/yyyy
+    "mm/dd/yyyy 형식으로",
+    "mm/dd/yyyy 포맷 사용",
+    "format: mm/dd/yyyy",
+    "use mm/dd/yyyy",
+    "set mm/dd/yyyy",
     
-    # 한국어+영어
-    "naver.com으로요, please.",
-    "네이버 메일로요, please.",
-    "네이버 계정 email로요.",
-    "네이버 메일 address로요.",
-    "네이버 email로요.",
-    "네이버 domain email로요.",
-    "네이버 계정 쓰고 계신 email로요.",
-    "네이버 account mail로요.",
-    "네이버 ID email로요.",
-    "네이버 도메인 mail로요.",
+    # Format specifications - yyyy-mm-dd
+    "yyyy-mm-dd 형식으로",
+    "yyyy-mm-dd 포맷 사용",
+    "format: yyyy-mm-dd",
+    "use yyyy-mm-dd",
+    "ISO format",
+    "ISO 8601",
+    "ymd",
+    "년-월-일 형식",
+    "YYYY년-MM월-DD일",
     
-    # 2. gmail.com
-    "gmail.com으로요.",
-    "지메일로요.",
-    "지메일 계정 이메일로요.",
-    "지메일 주소로요.",
-    "지메일 이메일로요.",
-    "지메일 도메인 이메일로요.",
-    "지메일 계정 쓰고 계신 이메일로요.",
+    # Format specifications - yyyy-mm
+    "yyyy-mm 형식으로",
+    "yyyy-mm 포맷 사용",
+    "format: yyyy-mm",
+    "use yyyy-mm",
     
-    # 영어
-    "To gmail.com, please.",
-    "With your Gmail email, please.",
-    "Using your Gmail account email, please.",
-    "To your Gmail mail address, please.",
-    "Using your Gmail email address, please.",
-    "With your Gmail domain email, please.",
-    "To the email you use for your Gmail account, please.",
+    # Format specifications - d/m/yyyy
+    "d/m/yyyy 형식으로",
+    "d/m/yyyy 포맷 사용",
+    "format: d/m/yyyy",
+    "use d/m/yyyy",
+    "dmy",
+    "일/월/년 형식",
     
-    # 한국어+영어
-    "gmail.com으로요, please.",
-    "지메일로요, please.",
-    "지메일 account email로요.",
-    "지메일 메일 address로요.",
-    "지메일 email로요.",
-    "지메일 domain email로요.",
-    "지메일 계정 쓰고 계신 email로요.",
+    # Format specifications - dd/mm/yyyy
+    "dd/mm/yyyy 형식으로",
+    "dd/mm/yyyy 포맷 사용",
+    "format: dd/mm/yyyy",
+    "use dd/mm/yyyy",
+    "day/month/year",
+    "DMY",
     
-    # 3. yahoo.com
-    "yahoo.com으로요.",
-    "야후 메일로요.",
-    "야후 계정 이메일로요.",
-    "야후 메일 주소로요.",
-    "야후 이메일로요.",
-    "야후 도메인 이메일로요.",
-    "야후 계정 쓰고 계신 이메일로요.",
+    # Mixed patterns with actual dates
+    "2023-01-05 형식으로",
+    "2023.1.5 포맷 사용",
+    "2023/01/05 방식으로",
+    "1-5-2023 형식",
+    "01/05/2023 포맷",
+    "23.01.05 방식",
     
-    # 영어
-    "To yahoo.com, please.",
-    "With your Yahoo email, please.",
-    "Using your Yahoo account email, please.",
-    "To your Yahoo mail address, please.",
-    "Using your Yahoo email address, please.",
-    "With your Yahoo domain email, please.",
-    "To the email you use for your Yahoo account, please.",
+    # Context-based format detection
+    "같은 형식으로 2023-01-05",
+    "처럼 2023.1.5",
+    "와 같은 2023/01/05",
+    "format to 2023-01-05",
+    "date format is 2023-01-05",
     
-    # 한국어+영어
-    "yahoo.com으로요, please.",
-    "야후 메일로요, please.",
-    "야후 account email로요.",
-    "야후 메일 address로요.",
-    "야후 email로요.",
-    "야후 domain email로요.",
-    "야후 계정 쓰고 계신 email로요.",
+    # Edge cases
+    "2023-01-05",  # Single date without format specification
+    "2023-01",     # Year-month only
+    "2023.1",      # Year-month with dot
+    "2023/1",      # Year-month with slash
     
-    # 4. hotmail.com
-    "hotmail.com으로요.",
-    "핫메일로요.",
-    "핫메일 계정 이메일로요.",
-    "핫메일 주소로요.",
-    "핫메일 이메일로요.",
-    "핫메일 도메인 이메일로요.",
-    "핫메일 계정 쓰고 계신 이메일로요.",
+    # Korean mixed patterns
+    "2023년 1월 5일 형식",
+    "2023년-1월-5일 방식",
+    "2023년/1월/5일 포맷",
     
-    # 영어
-    "To hotmail.com, please.",
-    "With your Hotmail email, please.",
-    "Using your Hotmail account email, please.",
-    "To your Hotmail mail address, please.",
-    "Using your Hotmail email address, please.",
-    "With your Hotmail domain email, please.",
-    "To the email you use for your Hotmail account, please.",
+    # Complex combinations
+    "from 2023-01-05 to 2023-12-31 in yyyy-mm-dd format",
+    "2023-01-05부터 2023-12-31까지 m/d/yyyy 형식으로",
+    "between 2023.1.5 and 2023.12.31 using ISO format",
+    "기간: 2023-01-05 ~ 2023-12-31, format: yyyy-mm-dd",
     
-    # 한국어+영어
-    "hotmail.com으로요, please.",
-    "핫메일로요, please.",
-    "핫메일 account email로요.",
-    "핫메일 메일 address로요.",
-    "핫메일 email로요.",
-    "핫메일 domain email로요.",
-    "핫메일 계정 쓰고 계신 email로요.",
+    # Ambiguous date patterns for format detection
+    "12/25/2023 형식으로",  # Should detect as m/d/yyyy
+    "25/12/2023 형식으로",  # Should detect as d/m/yyyy
+    "2023/12/31 형식으로",  # Should detect as yyyy-mm-dd
     
-    # 5. outlook.com
-    "outlook.com으로요.",
-    "아웃룩 메일로요.",
-    "아웃룩 계정 이메일로요.",
-    "아웃룩 주소로요.",
-    "아웃룩 이메일로요.",
-    "아웃룩 도메인 이메일로요.",
-    "아웃룩 계정 쓰고 계신 이메일로요.",
+    # Date validation and correction tests - Range patterns with invalid dates
+    "2023-01-05 ~ 2023-12-32 사이",  # 12월 32일 → 12월 31일로 보정
+    "from 2023-04-31 to 2023-06-32",  # 4월 31일 → 4월 30일, 6월 32일 → 6월 30일로 보정
+    "between 2023-01-00 and 2023-13-15",  # 1월 0일 → 1월 1일, 13월 → 12월로 보정
+    "2023.2.30 ~ 2023.4.31 범위",  # 2월 30일 → 2월 28일, 4월 31일 → 4월 30일로 보정
+    "2023/2/30부터 2023/4/31까지",  # 2월 30일 → 2월 28일, 4월 31일 → 4월 30일로 보정
     
-    # 영어
-    "To outlook.com, please.",
-    "With your Outlook email, please.",
-    "Using your Outlook account email, please.",
-    "To your Outlook mail address, please.",
-    "Using your Outlook email address, please.",
-    "With your Outlook domain email, please.",
-    "To the email you use for your Outlook account, please.",
+    # Date validation and correction tests - Single date patterns with invalid dates
+    "2024-02-30",  # 윤년 2월 30일 → 2월 29일로 보정
+    "2023-02-30",  # 평년 2월 30일 → 2월 28일로 보정
+    "2023.2.30",  # 평년 2월 30일 → 2월 28일로 보정 (점 구분자)
+    "2023/2/30",  # 평년 2월 30일 → 2월 28일로 보정 (슬래시 구분자)
+    "2023-04-31",  # 4월 31일 → 4월 30일로 보정
+    "2023-06-32",  # 6월 32일 → 6월 30일로 보정
+    "2023-01-00",  # 1월 0일 → 1월 1일로 보정
+    "2023-13-15",  # 13월 → 12월로 보정
     
-    # 한국어+영어
-    "outlook.com으로요, please.",
-    "아웃룩 메일로요, please.",
-    "아웃룩 account email로요.",
-    "아웃룩 메일 address로요.",
-    "아웃룩 email로요.",
-    "아웃룩 domain email로요.",
-    "아웃룩 계정 쓰고 계신 email로요.",
+    # Date validation and correction tests - Leap year cases
+    "2024-02-29",  # 윤년 2월 29일 (유효한 날짜)
+    "2023-02-29",  # 평년 2월 29일 → 2월 28일로 보정
+    "2024.2.29",  # 윤년 2월 29일 (유효한 날짜, 점 구분자)
+    "2023.2.29",  # 평년 2월 29일 → 2월 28일로 보정 (점 구분자)
     
-    # 6. 추가 도메인들
-    # daum.net
-    "daum.net으로요.",
-    "다음 메일로요.",
-    "다음 계정 이메일로요.",
-    "To daum.net, please.",
-    "With your Daum email, please.",
-    "To the email you use for your Daum account, please.",
+    # Date validation and correction tests - Different separators
+    "2023.4.31",  # 4월 31일 → 4월 30일로 보정 (점 구분자)
+    "2023/4/31",  # 4월 31일 → 4월 30일로 보정 (슬래시 구분자)
+    "2023.6.32",  # 6월 32일 → 6월 30일로 보정 (점 구분자)
+    "2023/6/32",  # 6월 32일 → 6월 30일로 보정 (슬래시 구분자)
     
-    # nate.com
-    "nate.com으로요.",
-    "네이트 메일로요.",
-    "네이트 계정 이메일로요.",
-    "To nate.com, please.",
-    "With your Nate email, please.",
-    "To the email you use for your Nate account, please.",
+    # Date validation and correction tests - Two-digit year
+    "23.2.30",  # 2자리 연도 2월 30일 → 2월 28일로 보정
+    "24.2.30",  # 2자리 연도 윤년 2월 30일 → 2월 29일로 보정
+    "23/2/30",  # 2자리 연도 2월 30일 → 2월 28일로 보정 (슬래시 구분자)
+    "24/2/30",  # 2자리 연도 윤년 2월 30일 → 2월 29일로 보정 (슬래시 구분자)
     
-    # hanmail.net
-    "hanmail.net으로요.",
-    "한메일 메일로요.",
-    "한메일 계정 이메일로요.",
-    "To hanmail.net, please.",
-    "With your Hanmail email, please.",
-    "To the email you use for your Hanmail account, please.",
+    # Date validation and correction tests - Edge cases
+    "2023-00-15",  # 0월 → 1월로 보정
+    "2023-12-00",  # 0일 → 1일로 보정
+    "2023-13-00",  # 13월 0일 → 12월 1일로 보정
+    "2023.0.15",  # 0월 → 1월로 보정 (점 구분자)
+    "2023.12.0",  # 0일 → 1일로 보정 (점 구분자)
     
-    # icloud.com
-    "icloud.com으로요.",
-    "아이클라우드 메일로요.",
-    "아이클라우드 계정 이메일로요.",
-    "To icloud.com, please.",
-    "With your iCloud email, please.",
-    "To the email you use for your iCloud account, please.",
+    # ── 범위 표현 (한국어)
+    "기간: 2023-01-05 ~ 2023-12-31, 형식은 yyyy-mm-dd",
+    "조회기간 2023.1.5 ~ 2023.12.31 (포맷: d/m/yyyy)",
+    "유효기간 2023/01/05 ~ 2023/12/31, 포맷은 mm/dd/yyyy",
+    "2023-01-05부터 2023-12-31까지, 형식 yyyy-mm-dd 적용",
+    "2023.01 ~ 2023.12 (yyyy-mm 형식)",
+    "2023/1 ~ 2023/12 범위, format yyyy-mm",
+    "시작 2023-01-05 종료 2023-12-31, 포맷 m/d/yyyy",
+    "기간(포함): 2023-01-05 ~ 2023-12-31, 형식 dd/mm/yyyy",
+    "from 2023-01-05 to 2023-12-31 (형식: yyyy-mm-dd)",
     
-    # protonmail.com
-    "protonmail.com으로요.",
-    "프로톤메일 메일로요.",
-    "프로톤메일 계정 이메일로요.",
-    "To protonmail.com, please.",
-    "With your ProtonMail email, please.",
-    "To the email you use for your ProtonMail account, please.",
+    # ── 단일 경계 (한국어)
+    "시작일은 2023-01-05, 포맷 yyyy-mm-dd",
+    "종료일은 2023-12-31, 형식 dd/mm/yyyy",
+    "기준일 이후: 2023-01-05 (yyyy-mm-dd)",
     
-    # 7. 학교 메일 도메인들
-    # 세종대학교
-    "sejong.ac.kr으로요.",
-    "세종대 메일로요.",
-    "세종대 이메일로요.",
-    "세종대 계정 이메일로요.",
-    "세종대학교 메일로요.",
-    "세종대학교 이메일로요.",
+    # ── 포맷 지정만 (한국어)
+    "포맷은 m/d/yyyy 로 고정",
+    "날짜 형식: yyyy-mm",
+    "포맷 dd/mm/yyyy 사용",
+    "형식은 yyyy-mm-dd 로 설정",
     
-    # 서울대학교
-    "snu.ac.kr으로요.",
-    "서울대 메일로요.",
-    "서울대 이메일로요.",
-    "서울대 계정 이메일로요.",
-    "서울대학교 메일로요.",
-    "서울대학교 이메일로요.",
+    # ── 공백/구두점/대시 변형 (한국어)
+    "기간 : 2023-01-05~2023-12-31 , 형식: yyyy-mm-dd",
+    "2023-01-05 – 2023-12-31 (en dash), 형식 yyyy-mm-dd",
+    "2023-01-05 — 2023-12-31 (em dash), 포맷 mm/dd/yyyy",
     
-    # 고려대학교
-    "korea.ac.kr으로요.",
-    "고려대 메일로요.",
-    "고려대 이메일로요.",
-    "고려대 계정 이메일로요.",
-    "고려대학교 메일로요.",
-    "고려대학교 이메일로요.",
+    # ── 한글 '년/월/일' 표기
+    "2023년 1월 5일 ~ 2023년 12월 31일, 형식 yyyy-mm-dd",
+    "보고서 기간(yyyy-mm): 2023년 1월 ~ 2023년 12월",
     
-    # 연세대학교
-    "yonsei.ac.kr으로요.",
-    "연세대 메일로요.",
-    "연세대 이메일로요.",
-    "연세대 계정 이메일로요.",
-    "연세대학교 메일로요.",
-    "연세대학교 이메일로요.",
+    # ── Null 허용 (한국어)
+    "nullable 50%, 기간 2023-01-05 ~ 2023-12-31, 형식 yyyy-mm-dd",
+    "빈값 25% 허용, 포맷은 d/m/yyyy",
     
-    # 카이스트
-    "kaist.ac.kr으로요.",
-    "카이스트 메일로요.",
-    "카이스트 이메일로요.",
-    "카이스트 계정 이메일로요.",
-    "한국과학기술원 메일로요.",
-    "한국과학기술원 이메일로요.",
+    # ── 범위 표현 (영어)
+    "Between 2023-01-05 and 2023-12-31, format yyyy-mm-dd",
+    "from 2023.1.5 through 2023.12.31, format d/m/yyyy",
+    "Range: 2023/01/05 to 2023/12/31, use mm/dd/yyyy",
+    "2023-01 ~ 2023-12 (format: yyyy-mm)",
+    "Start 2023-01-05, End 2023-12-31 (format m/d/yyyy)",
+    ">= 2023-01-05 and <= 2023-12-31, format dd/mm/yyyy",
     
-    # 포항공과대학교
-    "postech.ac.kr으로요.",
-    "포항공대 메일로요.",
-    "포항공대 이메일로요.",
-    "포항공대 계정 이메일로요.",
-    "포항공과대학교 메일로요.",
-    "포항공과대학교 이메일로요.",
+    # ── 단일 경계 (영어)
+    "start date: 2023-01-05 (format yyyy-mm-dd)",
+    "end date: 2023-12-31, format dd/mm/yyyy",
+    "on or after 2023-01-05 and on or before 2023-12-31, format yyyy-mm-dd",
     
-    # 경희대학교
-    "khu.ac.kr으로요.",
-    "경희대 메일로요.",
-    "경희대 이메일로요.",
-    "경희대 계정 이메일로요.",
-    "경희대학교 메일로요.",
-    "경희대학교 이메일로요.",
+    # ── 포맷 지정만 (영어)
+    "Format should be m/d/yyyy",
+    "Apply mm/dd/yyyy format",
+    "Use ISO 8601 (yyyy-mm-dd)",
+    "DATE FORMAT = dd/mm/yyyy",
+    "Format: YYYY-MM",  # 대문자 토큰
     
-    # 한양대학교
-    "hanyang.ac.kr으로요.",
-    "한양대 메일로요.",
-    "한양대 이메일로요.",
-    "한양대 계정 이메일로요.",
-    "한양대학교 메일로요.",
-    "한양대학교 이메일로요.",
+    # ── 공백/구두점/대시 변형 (영어)
+    "from   2023-01-05   to   2023-12-31,   format yyyy-mm-dd",
+    "2023-01-05–2023-12-31 (en dash), format mm/dd/yyyy",
+    "2023-01-05 — 2023-12-31, format d/m/yyyy",
     
-    # 이화여자대학교
-    "ewha.ac.kr으로요.",
-    "이화여대 메일로요.",
-    "이화여대 이메일로요.",
-    "이화여대 계정 이메일로요.",
-    "이화여자대학교 메일로요.",
-    "이화여자대학교 이메일로요.",
+    # ── 샘플로 포맷 유추 (영어)
+    "e.g., 1-5-2023 format (m/d/yyyy)",
+    "example: 01/05/2023 (mm/dd/yyyy)",
+    "sample: 25/12/2023 (d/m/yyyy)",
+    "sample: 2023-07-09 (yyyy-mm-dd)",
     
-    # 인하대학교
-    "inha.ac.kr으로요.",
-    "인하대 메일로요.",
-    "인하대 이메일로요.",
-    "인하대 계정 이메일로요.",
-    "인하대학교 메일로요.",
-    "인하대학교 이메일로요.",
+    # ── Null 허용 (영어)
+    "nullable 40%, format yyyy-mm-dd",
+    "Allow up to 30% nulls, format m/d/yyyy",
     
-    # 부산대학교
-    "pusan.ac.kr으로요.",
-    "부산대 메일로요.",
-    "부산대 이메일로요.",
-    "부산대 계정 이메일로요.",
-    "부산대학교 메일로요.",
-    "부산대학교 이메일로요.",
+    # ── 범위 + 포맷 혼합 (한국어+영어)
+    "기간 2023-01-05~2023-12-31, use yyyy-mm-dd",
+    "조회기간 2023.1.5 ~ 2023.12.31, format d/m/yyyy",
+    "2023/01/05 ~ 2023/12/31, 포맷 mm/dd/yyyy please",
+    "from 2023-01-05 to 2023-12-31, 포맷은 dd/mm/yyyy",
+    "2023-01 ~ 2023-12, format yyyy-mm only",
     
-    # 경북대학교
-    "knu.ac.kr으로요.",
-    "경북대 메일로요.",
-    "경북대 이메일로요.",
-    "경북대 계정 이메일로요.",
-    "경북대학교 메일로요.",
-    "경북대학교 이메일로요.",
+    # ── 단일 경계 (한국어+영어)
+    "시작일 2023-01-05, format yyyy-mm-dd",
+    "종료일 2023-12-31, use m/d/yyyy",
+    "start=2023-01-05; end=2023-12-31 (형식: yyyy-mm-dd)",
     
-    # 중앙대학교
-    "cau.ac.kr으로요.",
-    "중앙대 메일로요.",
-    "중앙대 이메일로요.",
-    "중앙대 계정 이메일로요.",
-    "중앙대학교 메일로요.",
-    "중앙대학교 이메일로요.",
+    # ── 포맷 지정만 (한국어+영어)
+    "format m/d/yyyy please",
+    "기본 포맷 dd/mm/yyyy",
+    "포맷만 설정: mm/dd/yyyy",
+    "DATE fmt -> yyyy-mm",
+    "set format = d/m/yyyy",
     
-    # 서강대학교
-    "sogang.ac.kr으로요.",
-    "서강대 메일로요.",
-    "서강대 이메일로요.",
-    "서강대 계정 이메일로요.",
-    "서강대학교 메일로요.",
-    "서강대학교 이메일로요.",
+    # ── 공백/구두점/대시 변형 (한국어+영어)
+    "기간 : 2023-01-05 ~ 2023-12-31 , format yyyy-mm-dd",
+    "2023-01-05–2023-12-31, 포맷 mm/dd/yyyy",
+    "2023-01-05 — 2023-12-31, use d/m/yyyy",
     
-    # 국민대학교
-    "kookmin.ac.kr으로요.",
-    "국민대 메일로요.",
-    "국민대 이메일로요.",
-    "국민대 계정 이메일로요.",
-    "국민대학교 메일로요.",
-    "국민대학교 이메일로요.",
+    # ── 샘플로 포맷 유추 (한국어+영어)
+    "예: 1-5-2023 같은 형식 (m/d/yyyy)",
+    "샘플 01/05/2023 → mm/dd/yyyy",
+    "예시는 25/12/2023 (d/m/yyyy)",
+    "sample 2023-07-09 → yyyy-mm-dd",
     
-    # 아주대학교
-    "ajou.ac.kr으로요.",
-    "아주대 메일로요.",
-    "아주대 이메일로요.",
-    "아주대 계정 이메일로요.",
-    "아주대학교 메일로요.",
-    "아주대학교 이메일로요.",
-    
-    # 조선대학교
-    "chosun.ac.kr으로요.",
-    "조선대 메일로요.",
-    "조선대 이메일로요.",
-    "조선대 계정 이메일로요.",
-    "조선대학교 메일로요.",
-    "조선대학교 이메일로요.",
-    
-    # 계명대학교
-    "kmu.ac.kr으로요.",
-    "계명대 메일로요.",
-    "계명대 이메일로요.",
-    "계명대 계정 이메일로요.",
-    "계명대학교 메일로요.",
-    "계명대학교 이메일로요.",
-    
-    # 단국대학교
-    "dankook.ac.kr으로요.",
-    "단국대 메일로요.",
-    "단국대 이메일로요.",
-    "단국대 계정 이메일로요.",
-    "단국대학교 메일로요.",
-    "단국대학교 이메일로요.",
-    
-    # 8. @도메인형 패턴 테스트 (임의의 도메인 지원)
-    # 한국어 패턴
-    "@am.dk형으로",
-    "@am.dk형로",
-    "@am.dk형으로요",
-    "@am.dk형로요",
-    "@am.dk형으로는",
-    "@am.dk형로는",
-    "@am.dk형으로만",
-    "@am.dk형로만",
-    "@am.dk형으로부터",
-    "@am.dk형로부터",
-    "@am.dk형으로 해주세요",
-    "@am.dk형로 해주세요",
-    "@am.dk형으로 부탁드립니다",
-    "@am.dk형로 부탁드립니다",
-    "@am.dk형으로 해주시면 됩니다",
-    "@am.dk형로 해주시면 됩니다",
-    "@am.dk형으로 작성해주세요",
-    "@am.dk형로 작성해주세요",
-    "@am.dk형 메일로",
-    "@am.dk형 메일로요",
-    "@am.dk형 메일 주소로",
-    "@am.dk형 이메일로",
-    "@am.dk형 이메일로요",
-    "@am.dk형 계정으로",
-    "@am.dk형 계정 이메일로",
-    
-    # 영어 패턴
-    "Make it in @am.dk email format.",
-    "Please use an email with @am.dk.",
-    "I need it as an @am.dk address.",
-    "With an @am.dk email, please.",
-    "Using @am.dk domain email, please.",
-    "Please make it an @am.dk account email.",
-    "Set it to @am.dk format.",
-    "Use @am.dk only.",
-    "Please send it from @am.dk.",
-    "Please write it with @am.dk.",
-    
-    # 한국어 + 영어 혼합 패턴
-    "@am.dk형으로, please.",
-    "@am.dk형로요, please.",
-    "Please, @am.dk형 메일로요.",
-    "@am.dk형 account email로요.",
-    "@am.dk형 메일 address로요.",
-    "@am.dk형 email로 부탁드려요.",
-    "@am.dk형 domain email로요.",
-    "Please send it from @am.dk형.",
-    "@am.dk형 only, 부탁드립니다.",
-    "Set it to @am.dk형 format으로요.",
-    
-    # 다른 도메인 테스트
-    "@example.com형으로요.",
-    "@test.org형 메일로요.",
-    "@company.co.kr형 이메일로요.",
-    "@university.edu형 계정으로요.",
-    "@startup.io형으로 해주세요.",
-    
-         # 임의의 도메인 테스트 (실제 도메인 형식이 아닌 경우)
-     "@3920형으로요.",
-     "@abc123형 메일로요.",
-     "@test형 이메일로요.",
-     "@mycompany형 계정으로요.",
-     "@random형으로 해주세요.",
-     "@12345형으로요.",
-     "@hello형 메일로요.",
-     "@world형 이메일로요.",
-     
-     # 추가 임의의 도메인 테스트
-     "@company형으로요.",
-     "@school형 메일로요.",
-     "@work형 이메일로요.",
-     "@home형 계정으로요.",
-     "@office형으로 해주세요.",
-     "@team형으로요.",
-     "@group형 메일로요.",
-     "@project형 이메일로요.",
-     "@service형으로요.",
-     "@app형 메일로요.",
-     "@site형 이메일로요.",
-     "@web형 계정으로요.",
-     "@user형으로 하고 결측치 30.",
-     "@admin형으로요.",
-     "@support형 메일로요.",
-     "@info로 null 10&",
+    # ── Null 허용 (한국어+영어)
+    "nullable 50%, 기간 2023-01-05~2023-12-31, format yyyy-mm-dd",
+    "빈 값 20% 허용, use m/d/yyyy",
 ]
 
 parser = Parser()
 
-for text in test_cases:
-    print(f"입력: {text}")
-    result = parser.parse_field_constraint(text)
-    print(result)
-    print("-" * 40)
+for i, text in enumerate(test_cases, 1):
+    print(f"## 입력: {text}")
+    try:
+        result = parser.parse_field_constraint(text)
+        print(f"{result}")
+    except Exception as e:
+        print(f"Error: {e}")
+    print()
