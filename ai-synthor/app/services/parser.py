@@ -46,6 +46,10 @@ class Parser:
         return reg
 
     def parse_field_constraint(self, text: str) -> Dict:
+        # 나이/연령 관련 키워드가 있으면 datetime으로 인식하지 않음
+        age_keywords = ['나이', '연령', '연령대', '나이대', '세', '살', 'age']
+        has_age_keyword = any(keyword in text for keyword in age_keywords)
+        
         # 날짜/포맷 지시어가 있으면 datetime 타입으로 고정 (우선순위: DateFormat > Nullable% > NumberBetween)
         datetime_indicators = [
             r'\b(?:format|date\s*format|m/d/yyyy|mm/dd/yyyy|d/m/yyyy|yyyy-mm-dd|yyyy-mm)\b',
@@ -60,6 +64,10 @@ class Parser:
         ]
         
         is_datetime_text = any(re.search(pattern, text, re.I) for pattern in datetime_indicators)
+        
+        # 나이 관련 키워드가 있으면 datetime으로 인식하지 않음
+        if has_age_keyword:
+            is_datetime_text = False
         
         # 추가 날짜 감지: 날짜 패턴이 있으면 무조건 datetime
         date_patterns = [
