@@ -153,6 +153,12 @@ class Parser:
                     field = "country"
                     extractor = country_extractor
         
+        elif field == "korean_full_name":
+            # korean_full_name은 그대로 유지
+            korean_full_name_extractor = self.registry.get("korean_full_name")
+            if korean_full_name_extractor:
+                extractor = korean_full_name_extractor
+        
         elif field == "email_address":
             email_extractor = self.registry.get("email_address")
             if email_extractor:

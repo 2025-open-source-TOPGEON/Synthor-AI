@@ -7,8 +7,8 @@ from typing import Dict, Any, List, Tuple, Optional
 from .field_constants import (
     SUPPORTED_TYPES, CONSTRAINT_TYPES, KOR_TO_ENG_FIELD, EN_TO_TYPE_FIELD
 )
-from .nullable_percent_parser import NullablePercentParser
-from .constraint_parsers import ConstraintParserFactory
+from .nullables import NullablePercentExtractor as NullablePercentParser
+# from .constraint_parsers import ConstraintParserFactory
 
 
 class FieldIdentifier:
@@ -102,7 +102,7 @@ class FieldConstraintParser:
         self.field_identifier = FieldIdentifier()
         self.nullable_parser = NullablePercentParser()
         self.general_parser = GeneralConstraintParser()
-        self.constraint_factory = ConstraintParserFactory()
+        # self.constraint_factory = ConstraintParserFactory()
     
     def parse(self, text: str) -> Dict[str, Any]:
         """
@@ -144,9 +144,9 @@ class FieldConstraintParser:
     
     def _parse_specific_constraints(self, field_type: str, text: str) -> Optional[Dict[str, Any]]:
         """Parse field-specific constraints."""
-        parser = self.constraint_factory.get_parser(field_type)
-        if parser:
-            return parser.parse(text)
+        # parser = self.constraint_factory.get_parser(field_type)
+        # if parser:
+        #     return parser.parse(text)
         return None
     
     def _create_null_response(self) -> Dict[str, Any]:

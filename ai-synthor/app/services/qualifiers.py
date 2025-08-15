@@ -1,7 +1,7 @@
 import re
 
 class GlobalQualifiersExtractor:
-    """성별/언어/나이/도메인 등 전역 보조 제약"""
+    """성별/언어/나이 등 전역 보조 제약"""
     def extract(self, text: str) -> dict:
         c = {}
         low = text.lower()
@@ -12,6 +12,5 @@ class GlobalQualifiersExtractor:
         m = re.search(r"(\d+)세 미만|under (\d+)", text)
         if m:
             c["max"] = int(m.group(1) or m.group(2)) - 1  # 배타적 처리
-        if "gmail" in low:
-            c["domain"] = "gmail.com"
+        # 도메인 제약 조건은 email_address 타입에만 적용되므로 여기서는 제거
         return c
