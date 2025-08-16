@@ -2,7 +2,7 @@ import re
 from .base import ConstraintExtractor
 
 class NumberBetweenExtractor(ConstraintExtractor):
-    type_name = "number_between_1_100"
+    type_name = "number"
 
     _FW_TO_ASCII = str.maketrans(
         "０１２３４５６７８９％－～",

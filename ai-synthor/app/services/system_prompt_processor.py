@@ -35,7 +35,7 @@ class SystemPromptProcessor:
             "time": "time",
             "latitude": "latitude",
             "longitude": "longitude",
-            "number_between_1_100": "number_between_1_100",
+            "number": "number",
             "product_price": "product_price",
             "currency": "currency",
             "iban": "iban",
@@ -105,7 +105,7 @@ class SystemPromptProcessor:
             "url": ["url", "website", "link"],
             "paragraphs": ["description", "bio", "about", "content"],
             "time": ["time", "created_time", "updated_time"],
-            "number_between_1_100": ["age", "quantity", "count"],
+            "number": ["age", "quantity", "count"],
         }
         
         # 개별 필드 파서 초기화
@@ -278,7 +278,7 @@ class SystemPromptProcessor:
             "korean_postal_code": "postal_code",
             "url": "url",
             "time": "time",
-            "number_between_1_100": "age",
+            "number": "age",
         }
         
         # 타입에 따른 기본 이름 반환
@@ -419,7 +419,7 @@ class SystemPromptProcessor:
             except:
                 pass
         
-        elif field_type == "number_between_1_100":
+        elif field_type == "number":
             try:
                 from .constraints.number_between import NumberBetweenExtractor
                 number_extractor = NumberBetweenExtractor()
@@ -652,7 +652,7 @@ class SystemPromptProcessor:
         if any(keyword in field_name_lower for keyword in ["프로필 이미지", "profile image", "profile picture", "profile photo", "아바타", "avatar"]):
             return "avatar"
         elif any(keyword in field_name_lower for keyword in ["나이", "age", "연령"]):
-            return "number_between_1_100"
+            return "number"
         elif any(keyword in field_name_lower for keyword in ["이름", "name", "성명", "full name", "first name", "last name"]):
             return "korean_full_name"
         elif any(keyword in field_name_lower for keyword in ["korean full name"]):

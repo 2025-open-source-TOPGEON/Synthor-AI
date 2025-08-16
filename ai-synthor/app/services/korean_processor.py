@@ -17,13 +17,13 @@ SUPPORTED_TYPES = {
     "username", "password", "email_address", "domain_name", "url", "mac_address", "ip_v4_address", "ip_v6_address",
     "user_agent", "avatar", "app_name", "app_version", "device_model", "device_brand", "device_os",
     "credit_card_number", "credit_card_type", "product_price", "currency", "iban", "swift_bic",
-    "paragraphs", "datetime", "time", "latitude", "longitude", "number_between_1_100"
+    "paragraphs", "datetime", "time", "latitude", "longitude", "number"
 }
 
 # 조건이 붙을 수 있는 타입 목록
 CONSTRAINT_TYPES = {
     "password", "phone", "avatar", "state", "country", "datetime", "time", "url",
-    "credit_card_number", "credit_card_type", "paragraphs", "number_between_1_100",
+    "credit_card_number", "credit_card_type", "paragraphs", "number",
     "korean_full_name", "korean_last_name", "email_address"
 }
 
@@ -286,12 +286,12 @@ KOR_TO_ENG_FIELD = {
     "위도": "latitude",
     # longitude
     "경도": "longitude",
-    # number_between_1_100
-    "숫자": "number_between_1_100",
-    "1과 100 사이 숫자": "number_between_1_100",
-    "1~100 숫자": "number_between_1_100",
-    "나이": "number_between_1_100",
-    "연령": "number_between_1_100",
+    # number
+    "숫자": "number",
+    "1과 100 사이 숫자": "number",
+    "1~100 숫자": "number",
+    "나이": "number",
+    "연령": "number",
 }
 
 # 한글 → 영문 값 매핑 (state, country, 카드사 등)
@@ -363,8 +363,8 @@ def parse_korean_text_to_json(text: str) -> dict:
             constraints = None
             # 조건이 붙을 수 있는 타입에만 조건 파싱 적용
             if eng in CONSTRAINT_TYPES:
-                # number_between_1_100
-                if eng == "number_between_1_100":
+                # number
+                if eng == "number":
                     min_match = re.search(r'(\d+)\s*이상|at least (\d+)', text, re.IGNORECASE)
                     max_match = re.search(r'(\d+)\s*이하|under (\d+)', text, re.IGNORECASE)
                     decimals_match = re.search(r'소수점\s*(\d+)자리|decimals?\s*(\d+)', text, re.IGNORECASE)
@@ -646,7 +646,7 @@ def parse_korean_text_to_json(text: str) -> dict:
             if eng not in SUPPORTED_TYPES:
                 unsupported_fields.append(eng)
             else:
-                if eng == "number_between_1_100":
+                if eng == "number":
                     field_type = "number"
                 elif eng.startswith("korean_") and "phone" in eng:
                     field_type = "string"
@@ -659,7 +659,7 @@ def parse_korean_text_to_json(text: str) -> dict:
                     field_name = "full_name"
                 elif eng == "email_address":
                     field_name = "email"
-                elif eng == "number_between_1_100":
+                elif eng == "number":
                     field_name = "age"
                 elif eng == "avatar":
                     field_name = "profile_image"
@@ -682,8 +682,8 @@ def parse_korean_text_to_json(text: str) -> dict:
             constraints = None
             # 조건이 붙을 수 있는 타입에만 constraints 파싱 적용
             if eng in CONSTRAINT_TYPES:
-                # number_between_1_100
-                if eng == "number_between_1_100":
+                # number
+                if eng == "number":
                     min_match = re.search(r'(\d+)\s*이상', text)
                     max_match = re.search(r'(\d+)\s*이하', text)
                     decimals_match = re.search(r'소수점\s*(\d+)자리', text)
@@ -897,7 +897,7 @@ def parse_korean_text_to_json(text: str) -> dict:
             if eng not in SUPPORTED_TYPES:
                 unsupported_fields.append(eng)
             else:
-                if eng == "number_between_1_100":
+                if eng == "number":
                     field_type = "number"
                 elif eng.startswith("korean_") and "phone" in eng:
                     field_type = "string"
@@ -910,7 +910,7 @@ def parse_korean_text_to_json(text: str) -> dict:
                     field_name = "full_name"
                 elif eng == "email_address":
                     field_name = "email"
-                elif eng == "number_between_1_100":
+                elif eng == "number":
                     field_name = "age"
                 elif eng == "avatar":
                     field_name = "profile_image"
@@ -966,7 +966,7 @@ if __name__ == "__main__":
         "없는카드 credit_card_type로 1개",
         "비밀번호 8자 이상, 대문자 1개, blank 0% 3개",
         "50x50 png avatar 2개",
-        "10 이상 50 이하 소수점 2자리 number_between_1_100 4개"
+        "10 이상 50 이하 소수점 2자리 number 4개"
     ]
     for text in test_cases:
         print(f"입력: {text}")

@@ -58,7 +58,7 @@ class FieldDetector:
             idx = text.find(kor)
             if idx != -1:
                 # 비밀번호 컨텍스트에서 길이 관련 키워드는 제외
-                if has_password_context and eng == "number_between_1_100" and any(length_word in kor for length_word in ["길이", "최소 길이", "최소길이"]):
+                if has_password_context and eng == "number" and any(length_word in kor for length_word in ["길이", "최소 길이", "최소길이"]):
                     continue
                 candidates.append((eng, idx, kor))
 
@@ -68,7 +68,7 @@ class FieldDetector:
             idx = low.find(eng_key.lower())
             if idx != -1:
                 # 비밀번호 컨텍스트에서 길이 관련 키워드는 제외
-                if has_password_context and eng_value == "number_between_1_100" and any(length_word in eng_key.lower() for length_word in ["length", "minimum length", "minimum"]):
+                if has_password_context and eng_value == "number" and any(length_word in eng_key.lower() for length_word in ["length", "minimum length", "minimum"]):
                     continue
                 candidates.append((eng_value, idx, eng_key))
 
@@ -83,7 +83,7 @@ class FieldDetector:
                             pidx = low.find(phrase)
                             if pidx != -1:
                                 # 비밀번호 컨텍스트에서 길이 관련 키워드는 제외
-                                if has_password_context and eng_value == "number_between_1_100" and any(length_word in phrase for length_word in ["length", "minimum length", "minimum"]):
+                                if has_password_context and eng_value == "number" and any(length_word in phrase for length_word in ["length", "minimum length", "minimum"]):
                                     continue
                                 candidates.append((eng_value, pidx, eng_key))
 

@@ -226,8 +226,8 @@ KOR_TO_ENG_FIELD = {
     "위도": "latitude",
     # longitude
     "경도": "longitude",
-    # number_between_1_100
-    "숫자": "number_between_1_100",
-    "1과 100 사이 숫자": "number_between_1_100",
-    "1~100 숫자": "number_between_1_100",
+    # number
+    "숫자": "number",
+    "1과 100 사이 숫자": "number",
+    "1~100 숫자": "number",
 }

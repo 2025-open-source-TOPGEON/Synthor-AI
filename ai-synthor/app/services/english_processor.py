@@ -68,7 +68,7 @@ EN_TO_TYPE_FIELD = {
     "time": "time",
     "latitude": "latitude",
     "longitude": "longitude",
-    "number": "number_between_1_100", "number between 1 and 100": "number_between_1_100",
+    "number": "number", "number between 1 and 100": "number",
 }
 
 def get_field_type_from_eng(keyword):
@@ -105,19 +105,19 @@ def parse_english_text_to_json(text: str) -> dict:
     supported_types = list(EN_TO_TYPE_FIELD.values())
     last_field = None
     segments = [seg.strip() for seg in re.split(r'[,.]', text)]
-    # number_between_1_100은 명시적으로 등장할 때만 필드로 추가
+    # number은 명시적으로 등장할 때만 필드로 추가
     explicit_number = any(
         key in text.lower() for key in ["number", "number between 1 and 100"]
     )
     for seg in segments:
         found = False
         for key in EN_TO_TYPE_FIELD.keys():
-            # number_between_1_100은 명시적으로 등장할 때만 필드로 추가
-            if EN_TO_TYPE_FIELD[key] == "number_between_1_100" and not explicit_number:
+            # number은 명시적으로 등장할 때만 필드로 추가
+            if EN_TO_TYPE_FIELD[key] == "number" and not explicit_number:
                 continue
             if key in seg.lower() and EN_TO_TYPE_FIELD[key] not in used_fields:
                 used_fields.add(EN_TO_TYPE_FIELD[key])
-                field_obj = {"name": EN_TO_TYPE_FIELD[key], "type": "string" if EN_TO_TYPE_FIELD[key] != "number_between_1_100" else "number"}
+                field_obj = {"name": EN_TO_TYPE_FIELD[key], "type": "string" if EN_TO_TYPE_FIELD[key] != "number" else "number"}
                 # password constraints
                 if EN_TO_TYPE_FIELD[key] == "password":
                     cdict = {}
@@ -177,8 +177,8 @@ def parse_english_text_to_json(text: str) -> dict:
                     if para_min: cdict["min"] = int(para_min.group(1))
                     if para_max: cdict["max"] = int(para_max.group(1))
                     if cdict: field_obj["constraints"] = cdict
-                # number_between_1_100
-                if EN_TO_TYPE_FIELD[key] == "number_between_1_100":
+                # number
+                if EN_TO_TYPE_FIELD[key] == "number":
                     cdict = {}
                     under = re.search(r'under (\d+)', seg, re.IGNORECASE)
                     over = re.search(r'over (\d+)', seg, re.IGNORECASE)
@@ -194,7 +194,7 @@ def parse_english_text_to_json(text: str) -> dict:
                 found = True
         # 조건만 있는 segment는 직전 필드가 constraints를 가질 수 있을 때만 붙임
         if not found and seg and last_field is not None:
-            if last_field["name"] in ["password", "paragraphs", "number_between_1_100", "email_address"]:
+            if last_field["name"] in ["password", "paragraphs", "number", "email_address"]:
                 cdict = last_field.get("constraints", {})
                 # password 조건
                 if last_field["name"] == "password":
@@ -214,8 +214,8 @@ def parse_english_text_to_json(text: str) -> dict:
                     para_max = re.search(r'no more than (\d+)', seg, re.IGNORECASE)
                     if para_min: cdict["min"] = int(para_min.group(1))
                     if para_max: cdict["max"] = int(para_max.group(1))
-                # number_between_1_100 조건
-                if last_field["name"] == "number_between_1_100":
+                # number 조건
+                if last_field["name"] == "number":
                     under = re.search(r'under (\d+)', seg, re.IGNORECASE)
                     over = re.search(r'over (\d+)', seg, re.IGNORECASE)
                     at_least = re.search(r'at least (\d+)', seg, re.IGNORECASE)

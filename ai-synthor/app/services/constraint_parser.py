@@ -273,7 +273,7 @@ class Parser:
         ]
         is_paragraph_text = any(re.search(pattern, text, re.I) for pattern in paragraph_keywords)
         
-        # 나이/연령 키워드가 있으면 number_between_1_100으로 우선 처리
+        # 나이/연령 키워드가 있으면 "number"으로 우선 처리
         age_keywords = [r'\b(?:나이|연령|age)\b']
         is_age_text = any(re.search(pattern, text, re.I) for pattern in age_keywords)
         
@@ -337,7 +337,7 @@ class Parser:
                     return {"type": None, "constraints": {}, "nullablePercent": None}
 
             # 날짜 관련 텍스트면 datetime 타입으로 강제 (FieldDetector 결과 무시)
-            # 단, 나이/연령 키워드가 있으면 number_between_1_100으로 유지
+            # 단, 나이/연령 키워드가 있으면 "number"으로 유지
             if is_datetime_text and not is_age_text and not is_integer_age:
                 field = "datetime"
                 extractor = self.registry.get("datetime") or self.default_extractor
@@ -345,13 +345,13 @@ class Parser:
                 extractor = self.registry.get(field) or self.default_extractor
 
         # 비밀번호 제약 조건 컨텍스트 후처리 (문단 키워드가 없을 때만)
-        if field == "number_between_1_100" and not is_paragraph_text:
+        if field == "number" and not is_paragraph_text:
             # 더 구체적인 비밀번호 키워드만 사용
             password_specific_keywords = ["비밀번호", "패스워드", "비번", "password", "대문자", "소문자", "특수문자", "특수기호", "symbol", "uppercase", "lowercase"]
-            # "숫자는 1에서 100 사이" 같은 경우는 number_between_1_100으로 유지
+            # "숫자는 1에서 100 사이" 같은 경우는 number으로 유지
             if re.search(r'숫자.*\d+.*\d+', text) and not any(keyword in text for keyword in ["비밀번호", "패스워드", "password"]):
-                field = "number_between_1_100"
-                extractor = self.registry.get("number_between_1_100") or self.default_extractor
+                field = "number"
+                extractor = self.registry.get("number") or self.default_extractor
             # 숫자 키워드는 비밀번호 컨텍스트에서만 사용
             elif any(keyword in text for keyword in password_specific_keywords) or ("숫자" in text and ("비밀번호" in text or "패스워드" in text or "password" in text)):
                 field = "password"

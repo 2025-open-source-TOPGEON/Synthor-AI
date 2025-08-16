@@ -76,7 +76,7 @@ test_cases = [
         "나이 nullable 10%",
         "age 결측치 5%",
         "연령 NULL 15%",
-        "number_between_1_100 min 3 max 3 decimals 3",
+        "number min 3 max 3 decimals 3",
         
                
                

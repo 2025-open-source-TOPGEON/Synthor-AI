@@ -15,13 +15,13 @@ SUPPORTED_TYPES = {
     "username", "password", "email_address", "domain_name", "url", "mac_address", "ip_v4_address", "ip_v6_address",
     "user_agent", "avatar", "app_name", "app_version", "device_model", "device_brand", "device_os",
     "credit_card_number", "credit_card_type", "product_price", "currency", "iban", "swift_bic",
-    "paragraphs", "datetime", "time", "latitude", "longitude", "number_between_1_100"
+    "paragraphs", "datetime", "time", "latitude", "longitude", "number"
 }
 
 # 제약이 붙는 타입
 CONSTRAINT_TYPES = {
     "password", "phone", "avatar", "state", "country", "datetime", "time", "url",
-    "credit_card_number", "credit_card_type", "paragraphs", "number_between_1_100", "korean_full_name", "korean_last_name", "email_address"
+    "credit_card_number", "credit_card_type", "paragraphs", "number", "korean_full_name", "korean_last_name", "email_address"
 }
 
 SUPPORTED_STATES = {
