@@ -40,7 +40,7 @@ class KoreanFullNameExtractor(ConstraintExtractor):
             if m:
                 surname = self._strip_josa(m.group(1))
                 if re.fullmatch(self._H15, surname):
-                    return {"last_name": surname}
+                    return {"lastName": surname}
 
         # 1) 한국어 핵심 패턴 (정확도 높은 것부터)
         primary_ko = [
@@ -71,7 +71,7 @@ class KoreanFullNameExtractor(ConstraintExtractor):
                 surname = self._strip_josa(m.group(1))
                 # 성씨 길이 검증만 하고, 사전 검증은 나중에 하도록 수정
                 if re.fullmatch(self._H15, surname):
-                    return {"last_name": surname}
+                    return {"lastName": surname}
 
         # 2) “X이라는 성(씨) … 가진/가지고 …” (비전통 성씨 허용)
         iri_patterns = [
@@ -82,7 +82,7 @@ class KoreanFullNameExtractor(ConstraintExtractor):
             if m:
                 surname = self._strip_josa(m.group(1))
                 if re.fullmatch(r'[가-힣]{1,10}', surname):
-                    return {"last_name": surname}
+                    return {"lastName": surname}
 
         # 3) 명사구: “X 성/성씨 [을/를/은/는] …”, “성: X”, “X씨 …”, “X 성/성씨를 쓰는…”
         noun_patterns = [
@@ -98,7 +98,7 @@ class KoreanFullNameExtractor(ConstraintExtractor):
             if m:
                 surname = self._strip_josa(m.group(1))
                 if re.fullmatch(self._H15, surname) or re.fullmatch(r'[가-힣]{2,10}', surname):
-                    return {"last_name": surname}
+                    return {"lastName": surname}
 
         # 4) 느슨한 fallback — 이어지는 접사/어미가 붙으면 배제
         loose = [
@@ -110,14 +110,14 @@ class KoreanFullNameExtractor(ConstraintExtractor):
             if m:
                 surname = self._strip_josa(m.group(1))
                 if re.fullmatch(self._H15, surname):
-                    return {"last_name": surname}
+                    return {"lastName": surname}
 
         # 5) korean_processor.py의 로직 추가 - "~씨" 패턴에서 성씨만 추출
         lastname_match = re.search(r'([가-힣]+)씨', t)
         if lastname_match:
             lastname = lastname_match.group(1)
             if re.fullmatch(self._H15, lastname):
-                return {"last_name": lastname}
+                return {"lastName": lastname}
 
         # 6) 여러 성씨 처리 (예: "이씨와 박씨만", "최씨, 정씨, 강씨 중에서만")
         multiple_surnames_patterns = [
@@ -137,9 +137,9 @@ class KoreanFullNameExtractor(ConstraintExtractor):
                 valid_surnames = [s for s in surnames if re.fullmatch(self._H15, s)]
                 if valid_surnames:
                     if len(valid_surnames) == 1:
-                        return {"last_name": valid_surnames[0]}
+                        return {"lastName": valid_surnames[0]}
                     else:
-                        return {"last_name": valid_surnames}
+                        return {"lastName": valid_surnames}
 
         # 7) 사전 기반 초-마지막 안전망
         KOREAN_SURNAMES = {
@@ -152,7 +152,7 @@ class KoreanFullNameExtractor(ConstraintExtractor):
         }
         for s in sorted(KOREAN_SURNAMES, key=len, reverse=True):
             if re.search(r'(?<![가-힣])' + re.escape(s) + r'(?=(?:으로|로)|[^가-힣]|$)', t):
-                return {"last_name": s}
+                return {"lastName": s}
 
         return {}
 

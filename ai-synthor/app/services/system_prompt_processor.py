@@ -150,6 +150,29 @@ class SystemPromptProcessor:
         """자연어로 된 필드 요청을 파싱합니다."""
         fields = []
         
+        # 문단 관련 특별 처리 - "정확히 3개의 문단" 같은 표현 우선 감지
+        if "문단" in prompt:
+            # 문단 필드 타입 추론
+            field_type = "paragraphs"
+            
+            # 기존 constraint parser 사용
+            field_constraints = self._parse_constraints_with_existing_parsers(prompt, field_type)
+            
+            # 필드명 생성 (영어로)
+            generated_name = self._generate_english_field_name("문단", field_type)
+            
+            # nullable_percent를 constraints에서 제거하고 별도 필드로 설정
+            nullable_percent = field_constraints.pop("nullable_percent", 0) if "nullable_percent" in field_constraints else 0
+            
+            fields.append({
+                "name": generated_name,
+                "type": self.field_type_mapping.get(field_type, field_type.title()),
+                "constraints": field_constraints,
+                "nullablePercent": nullable_percent
+            })
+            
+            return fields
+        
         # 필드명 추출 패턴 (한국어 + 영어)
         field_keywords = [
             # 프로필/아바타
@@ -174,6 +197,8 @@ class SystemPromptProcessor:
             "회사명", "company name", "company", "organization",
             # 직책
             "직책", "job title", "직위", "position", "title",
+            # 문단/설명
+            "단락", "paragraph", "description", "설명", "내용", "content",
             # 기타
             "city", "state", "country", "postal code", "zip code"
         ]
@@ -181,7 +206,6 @@ class SystemPromptProcessor:
         found_fields = []
         
         # 각 키워드가 프롬프트에 있는지 확인 (순서 유지)
-        found_fields = []
         for keyword in field_keywords:
             if keyword.lower() in prompt.lower():
                 found_fields.append(keyword)
@@ -234,6 +258,7 @@ class SystemPromptProcessor:
             "username": "username",
             "company_name": "company_name",
             "job_title": "job_title",
+            "paragraphs": "description",
         }
         
         # 타입에 따른 기본 이름 반환
@@ -318,6 +343,16 @@ class SystemPromptProcessor:
             except:
                 pass
         
+        elif field_type == "paragraphs":
+            try:
+                from .constraints.paragraphs import ParagraphsExtractor
+                paragraphs_extractor = ParagraphsExtractor()
+                paragraphs_constraints = paragraphs_extractor.extract(prompt)
+                if paragraphs_constraints:
+                    constraints.update(paragraphs_constraints)
+            except:
+                pass
+        
         # 전역 qualifiers 파싱 (기존 qualifiers 모듈 사용)
         try:
             from .qualifiers import GlobalQualifiersExtractor
@@ -333,6 +368,15 @@ class SystemPromptProcessor:
     def _infer_field_type(self, field_name: str, constraints_text: str) -> str:
         """필드명과 제약 조건을 기반으로 타입을 추론합니다."""
         field_name_lower = field_name.lower()
+        constraints_text_lower = constraints_text.lower()
+        
+        # 제약 조건 기반 추론 (우선순위 높음)
+        if "문단" in constraints_text_lower or "paragraph" in constraints_text_lower:
+            return "paragraphs"
+        elif "소수점" in constraints_text_lower or "decimal" in constraints_text_lower:
+            return "number_between_1_100"
+        elif "형식" in constraints_text_lower or "format" in constraints_text_lower:
+            return "datetime"
         
         # 필드명 기반 추론 (더 구체적인 매칭부터)
         if any(keyword in field_name_lower for keyword in ["프로필 이미지", "profile image", "profile picture", "profile photo", "아바타", "avatar"]):
@@ -351,12 +395,8 @@ class SystemPromptProcessor:
             return "address"
         elif any(keyword in field_name_lower for keyword in ["생년월일", "생일", "birth"]):
             return "datetime"
-        
-        # 제약 조건 기반 추론
-        if "소수점" in constraints_text or "decimal" in constraints_text.lower():
-            return "number_between_1_100"
-        elif "형식" in constraints_text or "format" in constraints_text.lower():
-            return "datetime"
+        elif any(keyword in field_name_lower for keyword in ["문단", "단락", "paragraph", "description", "설명", "내용"]):
+            return "paragraphs"
         
         return "full_name"  # 기본값
     
@@ -471,7 +511,8 @@ if __name__ == "__main__":
         "E-commerce user registration form with profile image 150x150 jpg format",
         "Password minimum 10 characters with uppercase, lowercase, numbers, symbols. Email only gmail.com",
         "온라인 교육 플랫폼 회원가입: 이름, 이메일(gmail.com만), 비밀번호(최소 10자 대문자 1개 소문자 1개 숫자 1개), 프로필 이미지(300x300 png), 나이(15 이상 70 이하), nullable 10%",
-        "온라인 교육 플랫폼 회원가입: 이름, 이메일(gmail.com만), 비밀번호(최소 10자 대문자 1개 소문자 1개 숫자 1개), 프로필 이미지(300x300 png), 나이(15 이상 70 이하"
+        "온라인 교육 플랫폼 회원가입: 이름, 이메일(gmail.com만), 비밀번호(최소 10자 대문자 1개 소문자 1개 숫자 1개), 프로필 이미지(300x300 png), 나이(15 이상 70 이하",
+        "정확히 3개의 문단, null 10",
     ]
     
     processor = SystemPromptProcessor()

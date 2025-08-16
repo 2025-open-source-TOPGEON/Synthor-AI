@@ -156,17 +156,15 @@ class ParagraphsExtractor(ConstraintExtractor):
                 r'(\d+)\s*–\s*(\d+)\s*개의?\s*문단', r'(\d+)\s*to\s*(\d+)\s*개의?\s*문단'
             ]
             
-            # 정확한 개수 패턴
+            # 정확한 개수 패턴 (범위 표현이 아닌 정확한 개수만)
             exact_pattern = '|'.join([
-                r'(\d+)\s*개', r'(\d+)\s*문단', r'(\d+)\s*단락', r'(\d+)\s*paragraphs?',
-                r'(\d+)\s*sections?', r'(\d+)\s*blocks?',
                 r'총\s*(\d+)\s*개', r'정확히\s*(\d+)\s*개', r'정확히\s*(\d+)\s*개의',
                 r'(\d+)\s*개로\s*작성', r'(\d+)\s*개로\s*제한', r'(\d+)\s*개로\s*구성',
-                r'(\d+)\s*개\s*문단', r'(\d+)\s*개\s*단락', r'(\d+)\s*개\s*paragraphs?',
+                r'(\d+)\s*개\s*문단', r'(\d+)\s*개\s*단락',
                 r'exactly\s*(\d+)', r'precisely\s*(\d+)', r'exactly\s*(\d+)\s*paragraphs?',
                 r'precisely\s*(\d+)\s*paragraphs?', r'(\d+)\s*paragraphs?\s*exactly',
                 r'(\d+)\s*개\s*\(exactly\s*\1\s*paragraphs?\)', r'정확히\s*(\d+)\s*\(exactly\s*\1\s*paragraphs?\)',
-                r'(\d+)\s*paragraphs?로\s*구성', r'(\d+)\s*paragraphs?로\s*작성',
+                r'(\d+)\s*paragraphs?로\s*구성되어야\s*합니다', r'(\d+)\s*paragraphs?로\s*작성되어야\s*합니다',
                 # 영어 숫자 정확한 개수 패턴들
                 r'exactly\s*(one|two|three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
                 r'precisely\s*(one|two|three|four|five|six|seven|eight|nine|ten)\s*paragraphs?',
@@ -174,65 +172,62 @@ class ParagraphsExtractor(ConstraintExtractor):
                 r'(one|two|three|four|five|six|seven|eight|nine|ten)\s*paragraphs?\s*precisely'
             ])
             
-            # 최소값 찾기
-            m_min = re.search(min_pattern, text, re.I)
-            if m_min:
-                min_val = safe_extract_number(m_min)
-                if min_val is not None:
-                    c["at least"] = min_val
-            
-            # 최대값 찾기
-            m_max = re.search(max_pattern, text, re.I)
-            if m_max:
-                max_val = safe_extract_number(m_max)
-                if max_val is not None:
-                    c["but no more than"] = max_val
-            
-            # 범위 찾기 (개별 패턴으로 처리)
-            for pattern in range_patterns:
-                m_range = re.search(pattern, text, re.I)
-                if m_range:
-                    groups = m_range.groups()
-                    if len(groups) >= 2:
-                        # 첫 번째 그룹을 최소값으로, 두 번째 그룹을 최대값으로 처리
-                        min_val = None
-                        max_val = None
-                        
-                        if groups[0] is not None:
-                            if groups[0].isdigit():
-                                min_val = safe_extract_number(re.match(r'(\d+)', groups[0]))
-                            else:
-                                min_val = word_to_number(groups[0])
-                        
-                        if groups[1] is not None:
-                            if groups[1].isdigit():
-                                max_val = safe_extract_number(re.match(r'(\d+)', groups[1]))
-                            else:
-                                max_val = word_to_number(groups[1])
-                        
-                        if min_val is not None and max_val is not None:
-                            # 최소값과 최대값이 올바른 순서인지 확인
-                            if min_val <= max_val:
-                                # 범위가 이미 설정되지 않은 경우에만 설정
-                                if "at least" not in c:
+            # 정확한 개수 찾기 (우선순위 높음 - 정확한 개수가 있으면 기존 값을 덮어씀)
+            m_exact = re.search(exact_pattern, text, re.I)
+            if m_exact:
+                exact_val = safe_extract_number(m_exact)
+                if exact_val is not None:
+                    c["at least"] = exact_val
+                    c["but no more than"] = exact_val
+            else:
+                # 정확한 개수가 없을 때만 범위와 최소/최대값 찾기
+                
+                # 범위 찾기 (개별 패턴으로 처리)
+                for pattern in range_patterns:
+                    m_range = re.search(pattern, text, re.I)
+                    if m_range:
+                        groups = m_range.groups()
+                        if len(groups) >= 2:
+                            # 첫 번째 그룹을 최소값으로, 두 번째 그룹을 최대값으로 처리
+                            min_val = None
+                            max_val = None
+                            
+                            if groups[0] is not None:
+                                if groups[0].isdigit():
+                                    min_val = safe_extract_number(re.match(r'(\d+)', groups[0]))
+                                else:
+                                    min_val = word_to_number(groups[0])
+                            
+                            if groups[1] is not None:
+                                if groups[1].isdigit():
+                                    max_val = safe_extract_number(re.match(r'(\d+)', groups[1]))
+                                else:
+                                    max_val = word_to_number(groups[1])
+                            
+                            if min_val is not None and max_val is not None:
+                                # 최소값과 최대값이 올바른 순서인지 확인
+                                if min_val <= max_val:
                                     c["at least"] = min_val
-                                if "but no more than" not in c:
                                     c["but no more than"] = max_val
-                            else:
-                                # 순서가 바뀐 경우 교환
-                                if "at least" not in c:
+                                else:
+                                    # 순서가 바뀐 경우 교환
                                     c["at least"] = max_val
-                                if "but no more than" not in c:
                                     c["but no more than"] = min_val
-                        break  # 첫 번째 매칭된 패턴만 사용
-            
-            # 정확한 개수 찾기 (최소/최대가 설정되지 않은 경우)
-            if "at least" not in c and "but no more than" not in c:
-                m_exact = re.search(exact_pattern, text, re.I)
-                if m_exact:
-                    exact_val = safe_extract_number(m_exact)
-                    if exact_val is not None:
-                        c["at least"] = exact_val
-                        c["but no more than"] = exact_val
+                            break  # 첫 번째 매칭된 패턴만 사용
+                
+                # 범위가 설정되지 않았을 때만 개별 최소/최대값 찾기
+                if "at least" not in c:
+                    m_min = re.search(min_pattern, text, re.I)
+                    if m_min:
+                        min_val = safe_extract_number(m_min)
+                        if min_val is not None:
+                            c["at least"] = min_val
+                
+                if "but no more than" not in c:
+                    m_max = re.search(max_pattern, text, re.I)
+                    if m_max:
+                        max_val = safe_extract_number(m_max)
+                        if max_val is not None:
+                            c["but no more than"] = max_val
         
         return c

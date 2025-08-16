@@ -415,6 +415,9 @@ class Parser:
 
         # 2) 전역 보조 제약 merge (password/phone 등 제한 타입일 때만 반영하려면 여기서 merge)
         global_c = self.qualifiers.extract(text)
+        # korean_full_name 타입에서는 lang qualifier 제거 (타입명에 korean이 포함되어 있어서 자동으로 추가됨)
+        if field == "korean_full_name" and "lang" in global_c:
+            del global_c["lang"]
         constraints.update(global_c)
 
         # 3) nullablePercent
@@ -426,5 +429,5 @@ class Parser:
             type_name = field
             return {"type": type_name, "constraints": constraints, "nullablePercent": nullable}
         else:
-            type_name = field
-            return {"type": type_name, "constraints": {}, "nullablePercent": nullable}
+            # type이 없을 때는 null 반환
+            return {"type": None, "constraints": {}, "nullablePercent": None}

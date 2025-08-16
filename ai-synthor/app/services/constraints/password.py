@@ -57,6 +57,7 @@ class PasswordExtractor(ConstraintExtractor):
             r'최소\s*length\s*(\d+)\s*이상|'                        # 최소 length 10 이상
             r'length\s*는\s*(\d+)\s*이상|'                          # length는 10 이상
             r'min(?:imum)?(?:\s*length)?[:\s]*(\d+)|'               # minimum length: 10
+            r'minimum_length\s*(\d+)|'                              # minimum_length 10
             r'min(?:imum)?\s*length\s*of\s*(\d+)|'                  # minimum length of 10
             r'length\s*(?:at\s*least|>=)\s*(\d+)|'                  # length at least 10 / length >= 10
             r'length\s*must\s*be\s*(\d+)\s*or\s*more|'              # length must be 10 or more
