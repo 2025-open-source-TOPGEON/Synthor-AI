@@ -10,7 +10,6 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-# CORS 미들웨어 추가 (개발 환경에서 캐시 문제 해결)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,6 +17,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 빠른 헬스 체크
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
+
+# 루트도 간단히 확인 가능하도록
+@app.get("/")
+def root():
+    return {"service": "Synthor-AI", "status": "up"}
 
 # 최종 경로: POST /api/fields/ai-suggest
 app.include_router(generation_router, prefix="/api")
