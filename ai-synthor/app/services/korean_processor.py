@@ -290,6 +290,8 @@ KOR_TO_ENG_FIELD = {
     "숫자": "number_between_1_100",
     "1과 100 사이 숫자": "number_between_1_100",
     "1~100 숫자": "number_between_1_100",
+    "나이": "number_between_1_100",
+    "연령": "number_between_1_100",
 }
 
 # 한글 → 영문 값 매핑 (state, country, 카드사 등)
