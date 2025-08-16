@@ -1,7 +1,7 @@
 from .constraint_parser import Parser
 
 test_cases = [
-        # Age/Number constraints        75
+      # Age/Number constraints        75
         "나이는 20 이상 60 이하, 소수점 1자리, nullable 10%",
         "나이 120 이하",
         "age between 25 and 65",
@@ -77,7 +77,10 @@ test_cases = [
         "age 결측치 5%",
         "연령 NULL 15%",
         "number_between_1_100 min 3 max 3 decimals 3",
-
+        
+               
+               
+      
 ]
 
 parser = Parser()

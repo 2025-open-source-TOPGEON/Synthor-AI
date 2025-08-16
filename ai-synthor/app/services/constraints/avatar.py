@@ -60,9 +60,9 @@ class AvatarExtractor(ConstraintExtractor):
 
         # png, bmp, jpg만 허용
         fmt_map = {
-            "png": r'\bpng\b|png\s*형식|png\s*포맷|png\s*로\s*저장|format\s*[:=]?\s*png',
-            "bmp": r'\bbmp\b|bmp\s*형식|bmp\s*포맷|bmp\s*로\s*저장|format\s*[:=]?\s*bmp',
-            "jpg": r'\bjpg\b|\bjpeg\b|jpe?g\s*형식|jpg\s*포맷|jpe?g\s*로\s*저장|format\s*[:=]?\s*(?:jpg|jpeg)',
+            "png": r'\bpng\b|png\s*형식|png\s*포맷|png\s*로\s*저장|format\s*[:=]?\s*png|png\s*로',
+            "bmp": r'\bbmp\b|bmp\s*형식|bmp\s*포맷|bmp\s*로\s*저장|format\s*[:=]?\s*bmp|bmp\s*로',
+            "jpg": r'\bjpg\b|\bjpeg\b|jpe?g\s*형식|jpg\s*포맷|jpe?g\s*로\s*저장|format\s*[:=]?\s*(?:jpg|jpeg)|jpe?g\s*로',
         }
 
         # 여러 형식 찾기

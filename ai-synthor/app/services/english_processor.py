@@ -136,9 +136,29 @@ def parse_english_text_to_json(text: str) -> dict:
                 if EN_TO_TYPE_FIELD[key] == "avatar":
                     avatar_size = re.search(r'(\d+)x(\d+)|size:?\s*(\d+)\s*[xX*]\s*(\d+)', seg, re.IGNORECASE)
                     avatar_format = None
-                    for fmt in ["png", "bmp", "jpg"]:
-                        if fmt in seg.lower():
-                            avatar_format = fmt
+                    
+                    # format 처리 개선 - 자연어 표현 포함
+                    fmt_patterns = {
+                        "png": r'\bpng\b|png\s*format|format\s*[:=]?\s*png|png\s*type|save\s*as\s*png|png\s*로',
+                        "bmp": r'\bbmp\b|bmp\s*format|format\s*[:=]?\s*bmp|bmp\s*type|save\s*as\s*bmp|bmp\s*로',
+                        "jpg": r'\bjpg\b|\bjpeg\b|jpe?g\s*format|format\s*[:=]?\s*(?:jpg|jpeg)|jpe?g\s*type|save\s*as\s*jpe?g|jpe?g\s*로',
+                    }
+                    
+                    found_formats = []
+                    for norm_fmt, pattern in fmt_patterns.items():
+                        if re.search(pattern, seg, re.IGNORECASE):
+                            if norm_fmt not in found_formats:
+                                found_formats.append(norm_fmt)
+                    
+                    if found_formats:
+                        if len(found_formats) == 1:
+                            avatar_format = found_formats[0]
+                        else:
+                            # 순서를 맞추기 위해 정렬 (jpg, png, bmp 순서)
+                            format_order = {"jpg": 0, "png": 1, "bmp": 2}
+                            sorted_formats = sorted(found_formats, key=lambda x: format_order.get(x, 3))
+                            avatar_format = sorted_formats[0]  # 첫 번째 것을 선택
+                    
                     cdict = {}
                     if avatar_size:
                         size_groups = avatar_size.groups()
