@@ -65,7 +65,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ### 1. 개별 필드 제약조건 생성
 
 ```bash
-curl -X POST "http://localhost:8000/api/fields/ai-suggest" \
+curl -X POST "https://synthor-ai.onrender.com/api/fields/ai-suggest" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "between 2023-01-05 and 2023-12-31"
