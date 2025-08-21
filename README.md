@@ -160,6 +160,13 @@ curl -X POST "https://synthor-ai.onrender.com/api/fields/auto-generate" \
 }
 ```
 
+### 혼합어(영어+한국어) 예시
+```json
+{
+  "prompt": "연령 less than or equal to 30"
+}
+```
+
 ## 테스트
 
 ```bash
@@ -170,7 +177,10 @@ curl -X GET "https://synthor-ai.onrender.com/healthz"
 # https://synthor-ai.onrender.com/docs 접속
 ```
 
-## 기여하는 방법
+## 기여 가이드 (How to Contribute)
+
+이 프로젝트는 오픈 소스 프로젝트로 누구나 기여할 수 있습니다.  
+아래 절차를 따라 참여해주세요:
 
 1. 이 저장소를 포크합니다
 2. 새로운 기능 브랜치를 생성합니다 (`git checkout -b feature/amazing-feature`)
