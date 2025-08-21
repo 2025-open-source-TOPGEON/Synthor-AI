@@ -97,7 +97,13 @@ curl -X POST "https://synthor-ai.onrender.com/api/fields/auto-generate" \
 
 **응답 예시:**
 ```json
- {'count': 6, 'fields': [{'name': 'full_name', 'type': 'full_name', 'constraints': {}, 'nullablePercent': 0}, {'name': 'email', 'type': 'email_address', 'constraints': {}, 'nullablePercent': 0}, {'name': 'password', 'type': 'password', 'constraints': {'minimum_length': 8}, 'nullablePercent': 0}, {'name': 'address', 'type': 'address', 'constraints': {}, 'nullablePercent': 0}, {'name': 'phone', 'type': 'phone', 'constraints': {}, 'nullablePercent': 0}, {'name': 'birth_date', 'type': 'datetime', 'constraints': {'format': 'yyyy-mm-dd'}, 'nullablePercent': 0}]}
+ {'count': 6,
+'fields': [{'name': 'full_name', 'type': 'full_name', 'constraints': {}, 'nullablePercent': 0},
+{'name': 'email', 'type': 'email_address', 'constraints': {}, 'nullablePercent': 0},
+{'name': 'password', 'type': 'password', 'constraints': {'minimum_length': 8}, 'nullablePercent': 0},
+{'name': 'address', 'type': 'address', 'constraints': {}, 'nullablePercent': 0},
+{'name': 'phone', 'type': 'phone', 'constraints': {}, 'nullablePercent': 0},
+{'name': 'birth_date', 'type': 'datetime', 'constraints': {'format': 'yyyy-mm-dd'}, 'nullablePercent': 0}]}
 ```
 
 ## 프로젝트 구조
