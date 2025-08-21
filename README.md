@@ -187,13 +187,3 @@ curl -X GET "https://synthor-ai.onrender.com/healthz"
 3. 변경사항을 커밋합니다 (`git commit -m 'Add some amazing feature'`)
 4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
 5. Pull Request를 생성합니다
-
-
-## 감사의 말
-
-이 프로젝트는 다음과 같은 오픈소스 프로젝트들을 기반으로 합니다:
-
-- [FastAPI](https://fastapi.tiangolo.com/) - 현대적인 웹 API 프레임워크
-- [Pydantic](https://pydantic-docs.helpmanual.io/) - 데이터 검증 라이브러리
-- [Uvicorn](https://www.uvicorn.org/) - ASGI 서버
-- [langdetect](https://github.com/Mimino666/langdetect) - 언어 감지 라이브러리
