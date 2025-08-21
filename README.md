@@ -109,7 +109,7 @@ curl -X POST "https://synthor-ai.onrender.com/api/fields/auto-generate" \
 ## 프로젝트 구조
 
 ```
-<img width="509" height="652" alt="synthor-ai" src="https://github.com/user-attachments/assets/b59fd83b-fe8c-499b-9c1a-860f66949dfb" />
+<img src="https://github.com/user-attachments/assets/b59fd83b-fe8c-499b-9c1a-860f66949dfb" width="509" height="652" />
 
 ```
 
