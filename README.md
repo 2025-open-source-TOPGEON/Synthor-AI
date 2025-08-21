@@ -7,7 +7,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 📖 개요
+## 개요
 
 Synthor-AI는 자연어 설명을 통해 데이터베이스 필드의 제약조건을 자동으로 생성하는 AI 서비스입니다. 개발자가 "비밀번호는 최소 10자 이상이고 숫자와 특수문자가 포함되어야 해"와 같은 자연어 설명을 입력하면, AI가 이를 분석하여 적절한 필드 타입과 제약조건을 자동으로 생성합니다.
 
