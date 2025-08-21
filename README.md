@@ -22,7 +22,7 @@ Synthor-AI는 자연어 설명을 통해 데이터베이스 필드의 제약조�
 
 ## 빠른 시작
 
-### Docker로 실행 (권장)
+### Docker로 실행
 
 ```bash
 # 저장소 클론
@@ -188,14 +188,14 @@ ai-synthor/
 ### 한국어 예시
 ```json
 {
-  "prompt": "사용자 이름은 한국어로 2-4글자여야 하고, 이메일은 필수입니다"
+  "prompt": "비밀번호는 최소 12자 이상이고 대문자 2개, 소문자 2개, 숫자 2개, 특수문자 2개 포함, 이메일은 naver.com"
 }
 ```
 
 ### 영어 예시
 ```json
 {
-  "prompt": "User name should be 2-4 characters in Korean, and email is required"
+  "prompt": "Password minimum 10 characters with uppercase, lowercase, numbers, symbols. Email only gmail.com"
 }
 ```
 
@@ -207,7 +207,7 @@ docker build -t synthor-ai .
 docker run -d -p 8000:8000 --name synthor-ai synthor-ai
 ```
 
-### Docker Compose (권장)
+### Docker Compose
 ```bash
 docker-compose up -d --build
 ```
