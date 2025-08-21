@@ -197,6 +197,7 @@ curl -X GET "https://synthor-ai.onrender.com/healthz"
 5. Pull Request를 생성합니다
 
 
+
 ## 감사의 말
 
 이 프로젝트는 다음과 같은 오픈소스 프로젝트들을 기반으로 합니다:
