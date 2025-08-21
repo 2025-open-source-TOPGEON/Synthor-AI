@@ -1,4 +1,4 @@
-# 🤖 Synthor-AI
+# Synthor-AI
 
 **자연어로 데이터 필드 제약조건을 자동 생성하는 AI 서비스**
 
@@ -11,7 +11,7 @@
 
 Synthor-AI는 자연어 설명을 통해 데이터베이스 필드의 제약조건을 자동으로 생성하는 AI 서비스입니다. 개발자가 "비밀번호는 최소 10자 이상이고 숫자와 특수문자가 포함되어야 해"와 같은 자연어 설명을 입력하면, AI가 이를 분석하여 적절한 필드 타입과 제약조건을 자동으로 생성합니다.
 
-### ✨ 주요 기능
+### 주요 기능
 
 - **개별 필드 제약조건 생성**: 자연어로 필드 설명을 입력하면 제약조건 자동 생성
 - **전체 필드 세트 자동 생성**: 시스템 목적을 설명하면 필요한 모든 필드 자동 생성
@@ -20,7 +20,7 @@ Synthor-AI는 자연어 설명을 통해 데이터베이스 필드의 제약조�
 - **RESTful API**: FastAPI 기반의 현대적인 API 제공
 - **Docker 지원**: 컨테이너화된 배포 환경
 
-## 🚀 빠른 시작
+## 빠른 시작
 
 ### Docker로 실행 (권장)
 
@@ -61,7 +61,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - **API 문서 (ReDoc)**: http://localhost:8000/redoc
 - **헬스체크**: http://localhost:8000/healthz
 
-## 📚 API 사용법
+## API 사용법
 
 ### 1. 개별 필드 제약조건 생성
 
@@ -127,7 +127,7 @@ curl -X POST "http://localhost:8000/api/fields/auto-generate" \
 }
 ```
 
-## 🏗️ 프로젝트 구조
+## 프로젝트 구조
 
 ```
 ai-synthor/
@@ -155,7 +155,7 @@ ai-synthor/
 └── deploy.sh                   # 자동 배포 스크립트
 ```
 
-## 🔧 지원하는 데이터 타입
+## 지원하는 데이터 타입
 
 ### 기본 타입
 - **비밀번호** (`password`): 길이, 문자 조합 제약조건
@@ -183,7 +183,7 @@ ai-synthor/
 - **제품 정보** (`product_name`, `product_category`, `product_description`, `product_price`)
 - **기술 정보** (`mac_address`, `ip_v4_address`, `ip_v6_address`, `user_agent`)
 
-## 🌍 다국어 지원
+## 다국어 지원
 
 ### 한국어 예시
 ```json
@@ -199,7 +199,7 @@ ai-synthor/
 }
 ```
 
-## 🐳 Docker 배포
+## Docker 배포
 
 ### 단일 컨테이너
 ```bash
@@ -218,14 +218,14 @@ docker-compose up -d --build
 - **Azure Container Instances**: `az container create`
 - **Render**: `render.yaml` 설정 파일 제공
 
-## 🔒 보안
+## 보안
 
 - CORS 설정으로 웹 브라우저 접근 허용
 - 입력 검증을 위한 Pydantic 스키마 사용
 - 환경 변수를 통한 설정 관리
 - 헬스체크 엔드포인트 제공
 
-## 🧪 테스트
+## 테스트
 
 ```bash
 # API 테스트
@@ -235,11 +235,11 @@ curl -X GET "http://localhost:8000/healthz"
 # http://localhost:8000/docs 접속
 ```
 
-## 📝 라이선스
+## 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
-## 🤝 기여하기
+## 기여하기
 
 1. 이 저장소를 포크합니다
 2. 새로운 기능 브랜치를 생성합니다 (`git checkout -b feature/amazing-feature`)
@@ -247,18 +247,16 @@ curl -X GET "http://localhost:8000/healthz"
 4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
 5. Pull Request를 생성합니다
 
-## 📞 지원
+## 지원
 
 - **이슈 리포트**: [GitHub Issues](https://github.com/your-username/synthor-ai/issues)
 - **문서**: [API 문서](http://localhost:8000/docs)
 - **이메일**: your-email@example.com
 
-## 🙏 감사의 말
+## 감사의 말
 
 이 프로젝트는 다음과 같은 오픈소스 프로젝트들을 기반으로 합니다:
 
 - [FastAPI](https://fastapi.tiangolo.com/) - 현대적인 웹 API 프레임워크
 - [Pydantic](https://pydantic-docs.helpmanual.io/) - 데이터 검증 라이브러리
 - [Uvicorn](https://www.uvicorn.org/) - ASGI 서버
-
----
