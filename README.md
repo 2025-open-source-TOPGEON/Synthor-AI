@@ -69,18 +69,18 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 curl -X POST "http://localhost:8000/api/fields/ai-suggest" \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "비밀번호는 최소 10자 이상이고 숫자와 특수문자가 포함되어야 해"
+    "prompt": "between 2023-01-05 and 2023-12-31"
   }'
 ```
 
 **응답 예시:**
 ```json
 {
-  "type": "password",
+  "type": "datetime",
   "constraints": {
-    "min_length": 10,
-    "require_digits": true,
-    "require_special_chars": true
+    "from": "2023-01-05",
+    "to": "2023-12-31",
+    "format": "m/d/yyyy"
   },
   "nullablePercent": 0
 }
@@ -98,33 +98,7 @@ curl -X POST "http://localhost:8000/api/fields/auto-generate" \
 
 **응답 예시:**
 ```json
-{
-  "count": 8,
-  "fields": [
-    {
-      "name": "full_name",
-      "type": "full_name",
-      "constraints": {},
-      "nullablePercent": 0
-    },
-    {
-      "name": "email",
-      "type": "email_address",
-      "constraints": {},
-      "nullablePercent": 0
-    },
-    {
-      "name": "password",
-      "type": "password",
-      "constraints": {
-        "min_length": 8,
-        "require_digits": true,
-        "require_special_chars": true
-      },
-      "nullablePercent": 0
-    }
-  ]
-}
+ {'count': 6, 'fields': [{'name': 'full_name', 'type': 'full_name', 'constraints': {}, 'nullablePercent': 0}, {'name': 'email', 'type': 'email_address', 'constraints': {}, 'nullablePercent': 0}, {'name': 'password', 'type': 'password', 'constraints': {'minimum_length': 8}, 'nullablePercent': 0}, {'name': 'address', 'type': 'address', 'constraints': {}, 'nullablePercent': 0}, {'name': 'phone', 'type': 'phone', 'constraints': {}, 'nullablePercent': 0}, {'name': 'birth_date', 'type': 'datetime', 'constraints': {'format': 'yyyy-mm-dd'}, 'nullablePercent': 0}]}
 ```
 
 ## 프로젝트 구조
