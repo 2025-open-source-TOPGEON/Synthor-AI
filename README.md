@@ -109,29 +109,8 @@ curl -X POST "https://synthor-ai.onrender.com/api/fields/auto-generate" \
 ## 프로젝트 구조
 
 ```
-ai-synthor/
-├── app/
-│   ├── api/
-│   │   └── endpoints/
-│   │       └── generation.py      # API 엔드포인트
-│   ├── services/
-│   │   ├── constraints/           # 제약조건 추출기들
-│   │   │   ├── base.py           # 기본 추출기 인터페이스
-│   │   │   ├── password.py       # 비밀번호 제약조건
-│   │   │   ├── email.py          # 이메일 제약조건
-│   │   │   ├── phone.py          # 전화번호 제약조건
-│   │   │   └── ...               # 기타 제약조건들
-│   │   ├── constraint_parser.py  # 메인 파서
-│   │   ├── system_prompt_processor.py  # 전체 필드 생성
-│   │   ├── korean_processor.py   # 한국어 처리
-│   │   └── english_processor.py  # 영어 처리
-│   ├── schemas/
-│   │   └── nlp.py               # Pydantic 스키마
-│   └── main.py                  # FastAPI 앱
-├── Dockerfile                   # Docker 설정
-├── docker-compose.yml          # Docker Compose 설정
-├── requirements.txt            # Python 의존성
-└── deploy.sh                   # 자동 배포 스크립트
+<img width="509" height="652" alt="synthor-ai" src="https://github.com/user-attachments/assets/b59fd83b-fe8c-499b-9c1a-860f66949dfb" />
+
 ```
 
 ## 지원하는 데이터 타입
