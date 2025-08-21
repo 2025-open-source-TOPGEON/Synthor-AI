@@ -26,13 +26,13 @@ Synthor-AI는 자연어 설명을 통해 데이터베이스 필드의 제약조�
 
 ```bash
 # 저장소 클론
-git clone https://github.com/your-username/synthor-ai.git
-cd synthor-ai/ai-synthor
+git clone https://github.com/2025-open-source-TOPGEON/Synthor-AI.git
+cd Synthor-AI/ai-synthor
 
 # Docker Compose로 실행
-docker-compose up -d
+docker compose up -d
 
-# 또는 자동 배포 스크립트 사용
+# 또는 자동 배포 스크립트 사용 (파일이 있는 경우만)
 chmod +x deploy.sh
 ./deploy.sh
 ```
