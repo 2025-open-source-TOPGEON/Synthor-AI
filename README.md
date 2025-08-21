@@ -178,40 +178,14 @@ ai-synthor/
 }
 ```
 
-## Docker 배포
-
-### 단일 컨테이너
-```bash
-docker build -t synthor-ai .
-docker run -d -p 8000:8000 --name synthor-ai synthor-ai
-```
-
-### Docker Compose
-```bash
-docker-compose up -d --build
-```
-
-### 클라우드 배포
-- **AWS EC2**: `docker-compose up -d`
-- **Google Cloud Run**: `gcloud run deploy`
-- **Azure Container Instances**: `az container create`
-- **Render**: `render.yaml` 설정 파일 제공
-
-## 보안
-
-- CORS 설정으로 웹 브라우저 접근 허용
-- 입력 검증을 위한 Pydantic 스키마 사용
-- 환경 변수를 통한 설정 관리
-- 헬스체크 엔드포인트 제공
-
 ## 테스트
 
 ```bash
 # API 테스트
-curl -X GET "http://localhost:8000/healthz"
+curl -X GET "https://synthor-ai.onrender.com/healthz"
 
 # Swagger UI를 통한 인터랙티브 테스트
-# http://localhost:8000/docs 접속
+# https://synthor-ai.onrender.com/docs 접속
 ```
 
 ## 라이선스
