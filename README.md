@@ -61,6 +61,10 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - **헬스체크**: https://synthor-ai.onrender.com/healthz
 
 
+## 자연어 입력 예시
+여기 제시된 예시는 일부 사례이며,다른 필드 타입과 다양한 입력 값 또한 지원됩니다.
+아직 다른 타입에 대한 테스트는 제한적이지만, 추후 더 많은 필드 조건을 인식하고 다양한 타입을 처리할 수 있도록 확장할 예정입니다.
+➡️ [자연어 입력 테스트 보기](https://www.notion.so/256f3c022ee680a99ca1c8d3c89036dc?source=copy_link)
 
 
 
