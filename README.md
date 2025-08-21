@@ -111,6 +111,7 @@ curl -X POST "https://synthor-ai.onrender.com/api/fields/auto-generate" \
 
 
 
+
 ## 지원하는 데이터 타입
 
 ### 기본 타입
