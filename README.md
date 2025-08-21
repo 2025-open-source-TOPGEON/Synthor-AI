@@ -188,14 +188,13 @@ curl -X GET "https://synthor-ai.onrender.com/healthz"
 # https://synthor-ai.onrender.com/docs 접속
 ```
 
-## 기여하는 방법법
+## 기여하는 방법
 
 1. 이 저장소를 포크합니다
 2. 새로운 기능 브랜치를 생성합니다 (`git checkout -b feature/amazing-feature`)
 3. 변경사항을 커밋합니다 (`git commit -m 'Add some amazing feature'`)
 4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
 5. Pull Request를 생성합니다
-
 
 
 ## 감사의 말
@@ -205,4 +204,4 @@ curl -X GET "https://synthor-ai.onrender.com/healthz"
 - [FastAPI](https://fastapi.tiangolo.com/) - 현대적인 웹 API 프레임워크
 - [Pydantic](https://pydantic-docs.helpmanual.io/) - 데이터 검증 라이브러리
 - [Uvicorn](https://www.uvicorn.org/) - ASGI 서버
-- - [langdetect](https://github.com/Mimino666/langdetect) - 언어 감지 라이브러리
+- [langdetect](https://github.com/Mimino666/langdetect) - 언어 감지 라이브러리
