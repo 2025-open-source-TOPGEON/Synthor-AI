@@ -58,7 +58,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 - **애플리케이션**: https://synthor-ai.onrender.com
 - **API 문서 (Swagger)**: https://synthor-ai.onrender.com/docs
-- **API 문서 (ReDoc)**: https://synthor-ai.onrender.com/redoc
 - **헬스체크**: https://synthor-ai.onrender.com/healthz
 
 ## API 사용법
