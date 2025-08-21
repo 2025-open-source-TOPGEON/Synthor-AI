@@ -60,6 +60,10 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - **API 문서 (Swagger)**: https://synthor-ai.onrender.com/docs
 - **헬스체크**: https://synthor-ai.onrender.com/healthz
 
+
+
+
+
 ## API 사용법
 
 ### 1. 개별 필드 제약조건 생성
