@@ -88,7 +88,7 @@ curl -X POST "https://synthor-ai.onrender.com/api/fields/ai-suggest" \
 ### 2. 전체 필드 세트 자동 생성
 
 ```bash
-curl -X POST "http://localhost:8000/api/fields/auto-generate" \
+curl -X POST "https://synthor-ai.onrender.com/api/fields/auto-generate" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "쇼핑몰에서 사용자 등록을 위한 정보"
