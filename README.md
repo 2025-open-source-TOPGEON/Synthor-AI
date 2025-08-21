@@ -56,10 +56,10 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ### 접속 정보
 
-- **애플리케이션**: http://localhost:8000
-- **API 문서 (Swagger)**: http://localhost:8000/docs
-- **API 문서 (ReDoc)**: http://localhost:8000/redoc
-- **헬스체크**: http://localhost:8000/healthz
+- **애플리케이션**: https://synthor-ai.onrender.com
+- **API 문서 (Swagger)**: https://synthor-ai.onrender.com/docs
+- **API 문서 (ReDoc)**: https://synthor-ai.onrender.com/redoc
+- **헬스체크**: https://synthor-ai.onrender.com/healthz
 
 ## API 사용법
 
